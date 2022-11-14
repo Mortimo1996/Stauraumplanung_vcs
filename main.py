@@ -17,4 +17,5 @@ if __name__ == '__main__':
     print("How r u?")
 
 print(myfunc(1,3))
+print("Pimm")
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
