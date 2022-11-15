@@ -6,19 +6,50 @@
 from tqdm import tqdm
 import time
 import progressbar
+from tkinter import *
+from tkinter import ttk
+import time
+import threading
+from tkinter.ttk import *
+import tkinter
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press ⌘F8 to toggle the breakpoint.
+# class App():
+#    def __init__(self):
+#        self.root = tkinter.Tk()
+#        button = tkinter.Button(self.root, text = 'root quit', command=self.quit)
+#        button.pack()
+#        self.root.mainloop()
+#
+#    def quit(self):
+#        self.root.destroy()
+#
+# app = App()
 
-def myfunc(a,b):
-    return a-b
+# #https://www.youtube.com/watch?v=0WRMYdOwHYE
+def start():
+    tasks = 10 #In unserem Beispiel könnten das die Rechenoperationen sein, welche wir zu der Zeit durchlaufen
+    x = 0 #x stellt die Rechenoperation dar, welche gerade ausgeführt wird
+    while (x < tasks):
+        time.sleep(1)
+        bar['value'] += 10 #die zehn sind hier ein Beispiel, wenn es 5 Operationen wären bspw 20
+        x+=1 #inkrementieren nach jeder ausgeführten Rechenoperation
+        percent.set(str((x/tasks)*100)+"%")
+        window.update_idletasks()
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-    print("How r u?")
+def quit():
+    window.destroy()
 
+window = Tk()
+
+percent = StringVar()
+bar = Progressbar(window,orient=HORIZONTAL,length=300)
+bar.pack(pady=10)
+
+percentlabel = Label(window,textvariable=percent).pack()
+button = Button(window,text="Download",command=start).pack()
+button2 = Button(window,text="Close",command=quit).pack()
+
+window.mainloop()
 
 
 #for i in tqdm(range(100), desc="Loading...", ascii=False,ncols=75):
@@ -29,10 +60,7 @@ if __name__ == '__main__':
 #https://derlinuxwikinger.de/ladebalken-mit-python-tkinter/ -> PROGRESSBAR
 #https://stackoverflow.com/questions/50815547/simple-loading-screen-in-python-tkinter -> EINBETTUNG IN LAUFZEIT -> RECHENZEIT
 
-from tkinter import *
-from tkinter import ttk
-import time
-import threading
+
 
 # window = Tk()
 # window.title("Progressbar")
