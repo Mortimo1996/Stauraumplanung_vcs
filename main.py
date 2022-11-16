@@ -25,6 +25,8 @@ import tkinter
 #
 # app = App()
 
+#IIIIIIIIIIIIII
+
 # #https://www.youtube.com/watch?v=0WRMYdOwHYE
 def start():
     tasks = 10 #In unserem Beispiel könnten das die Rechenoperationen sein, welche wir zu der Zeit durchlaufen
