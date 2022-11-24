@@ -37,7 +37,7 @@ def start():
         bar['value'] += 10  # die zehn sind hier ein Beispiel, wenn es 5 Operationen wären bspw 20
         x += 1  # inkrementieren nach jeder ausgeführten Rechenoperation
         percent.set(str((x / tasks) * 100) + "%")
-        window.update_idletasks()
+        window.update()
 
 
 def quit():
@@ -52,7 +52,7 @@ bar.pack(pady=10)
 
 percentlabel = Label(window, textvariable=percent).pack()
 button = Button(window, text="Download", command=start).pack()
-# button2 = Button(window,text="Close",command=quit).pack()
+button2 = Button(window,text="Close",command=quit).pack()
 
 window.mainloop()
 
