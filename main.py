@@ -13,6 +13,7 @@ import threading
 from tkinter.ttk import *
 import tkinter
 
+
 # class App():
 #    def __init__(self):
 #        self.root = tkinter.Tk()
@@ -25,43 +26,43 @@ import tkinter
 #
 # app = App()
 
-#IIIIIIIIIIIIII
+# IIIIIIIIIIIIII
 
 # #https://www.youtube.com/watch?v=0WRMYdOwHYE
 def start():
-    tasks = 10 #In unserem Beispiel könnten das die Rechenoperationen sein, welche wir zu der Zeit durchlaufen
-    x = 0 #x stellt die Rechenoperation dar, welche gerade ausgeführt wird
+    tasks = 10  # In unserem Beispiel könnten das die Rechenoperationen sein, welche wir zu der Zeit durchlaufen
+    x = 0  # x stellt die Rechenoperation dar, welche gerade ausgeführt wird
     while (x < tasks):
         time.sleep(1)
-        bar['value'] += 10 #die zehn sind hier ein Beispiel, wenn es 5 Operationen wären bspw 20
-        x+=1 #inkrementieren nach jeder ausgeführten Rechenoperation
-        percent.set(str((x/tasks)*100)+"%")
+        bar['value'] += 10  # die zehn sind hier ein Beispiel, wenn es 5 Operationen wären bspw 20
+        x += 1  # inkrementieren nach jeder ausgeführten Rechenoperation
+        percent.set(str((x / tasks) * 100) + "%")
         window.update_idletasks()
+
 
 def quit():
     window.destroy()
 
+
 window = Tk()
 
 percent = StringVar()
-bar = Progressbar(window,orient=HORIZONTAL,length=300)
+bar = Progressbar(window, orient=HORIZONTAL, length=300)
 bar.pack(pady=10)
 
-percentlabel = Label(window,textvariable=percent).pack()
-button = Button(window,text="Download",command=start).pack()
-button2 = Button(window,text="Close",command=quit).pack()
+percentlabel = Label(window, textvariable=percent).pack()
+button = Button(window, text="Download", command=start).pack()
+# button2 = Button(window,text="Close",command=quit).pack()
 
 window.mainloop()
 
+# for i in tqdm(range(100), desc="Loading...", ascii=False,ncols=75):
+# time.sleep(0.01)
 
-#for i in tqdm(range(100), desc="Loading...", ascii=False,ncols=75):
-    #time.sleep(0.01)
+# print("Complete")
 
-#print("Complete")
-
-#https://derlinuxwikinger.de/ladebalken-mit-python-tkinter/ -> PROGRESSBAR
-#https://stackoverflow.com/questions/50815547/simple-loading-screen-in-python-tkinter -> EINBETTUNG IN LAUFZEIT -> RECHENZEIT
-
+# https://derlinuxwikinger.de/ladebalken-mit-python-tkinter/ -> PROGRESSBAR
+# https://stackoverflow.com/questions/50815547/simple-loading-screen-in-python-tkinter -> EINBETTUNG IN LAUFZEIT -> RECHENZEIT
 
 
 # window = Tk()
@@ -124,15 +125,15 @@ window.mainloop()
 #     proc.start()
 
 
-#progressbar_btn = Button(window, text="Prozess starten", bg='white', command=lambda: [progressbar().start_progressbar(), action_timer().action_timer_thread(), progressbar().check_process_thread()])
-#progressbar_btn.pack()
+# progressbar_btn = Button(window, text="Prozess starten", bg='white', command=lambda: [progressbar().start_progressbar(), action_timer().action_timer_thread(), progressbar().check_process_thread()])
+# progressbar_btn.pack()
 
-#window.mainloop()
+# window.mainloop()
 
-#print(myfunc(1,3))
-#print("Pimm")
+# print(myfunc(1,3))
+# print("Pimm")
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
 
-#später in GUS-Schnittstelle https://blogs.sap.com/2020/06/09/connecting-python-with-sap-step-by-step-guide/
-#https://www.heise.de/ratgeber/Programmieren-mit-Python-Schnittstellen-entwickeln-mit-Pycharm-und-FastAPI-4940182.html
-#https://towardsdatascience.com/the-right-way-to-build-an-api-with-python-cd08ab285f8f
+# später in GUS-Schnittstelle https://blogs.sap.com/2020/06/09/connecting-python-with-sap-step-by-step-guide/
+# https://www.heise.de/ratgeber/Programmieren-mit-Python-Schnittstellen-entwickeln-mit-Pycharm-und-FastAPI-4940182.html
+# https://towardsdatascience.com/the-right-way-to-build-an-api-with-python-cd08ab285f8f
