@@ -63,11 +63,13 @@ window.mainloop()
 ########################################################################################################
 #Sammlung Lara
 
-#gute Bsp. für mip: https://python-mip.readthedocs.io/en/latest/examples.html
+#gute Beispiele für mip: https://python-mip.readthedocs.io/en/latest/examples.html
+#https://python-mip.readthedocs.io/en/latest/classes.html
 
 from sys import stdout
 from mip import Model, xsum, minimize, maximize, BINARY
 from itertools import product
+import numpy as np
 
 
 #______________________________________________________________________________________________________
@@ -126,25 +128,39 @@ print(queens.vars[7*40+1],'\t',queens.vars[7*40+1].x)"""
 
 #### Unser Projekt ####
 model = Model()
-n=5
+
+#Parameter definieren - P, h und m sind hier für die Tour 04587 aus den Novemberdaten
+P=46
+Q=max(0,P-33)
+
+I=range(P)
+J=range(2)
+K=range(11)
+L=range(3)
+
+n=np.arange(P)
+h=np.zeros(P)
+h[10]=1         #hier vereinfacht nur eine Hochpalette angenommen
+m=[891.2, 376.04, 376.04, 891.2, 141.032, 600.8, 600.8, 600.8, 376.04, 376.04, 196.392, 153.074, 362.078, 362.078, 376.04, 376.04, 376.04, 376.04, 376.04, 367.472, 323.03, 344.146, 258.46, 156.054, 276.918, 29.059, 113.13, 376.04, 376.04, 335.94, 313.952, 274.056, 189.256, 367.472, 278.1, 106.94, 525.008, 424.568, 377.743, 164.288, 367.472, 213.34, 376.04, 202.532, 378.2, 376.04]
+
+M=100
+
+
+#Variablen hinzufügen
 """x = [[[[model.add_var('x({},{},{},{})'.format(i,j,k,l), var_type=BINARY)
         for l in range(1,3+1)] for k in range(1,4+1)] for j in range(1,2+1)] for i in range(1,n+1)]
 
 # model.vars['x(5,2,4,3)'] entspricht x[4][1][3][2] - deshalb var-Erstellung nochmal geändert"""
 
-I=range(n)
-J=range(2)
-K=range(4)
-L=range(3)
-
 x = [[[[model.add_var('x({},{},{},{})'.format(i,j,k,l), var_type=BINARY)
         for l in L] for k in K] for j in J] for i in I]
-
 # jetzt entspricht model.vars['x(4,1,3,2)'] auch x[4][1][3][2]
 
-#Zielfunktion: hier vereinfacht erstmal die Summe
-model.objective = maximize(xsum(x[i][j][k][l] for i in I for j in J for k in K for l in L))
+GL = model.add_var(name='GL', lb=0, var_type='C')
+GR = model.add_var(name='GR', lb=0, var_type='C')
 
+
+#Nebenbedingungen hinzufügen
 #NB jede Pal einen Platz
 for i in I:
   model += xsum(x[i][j][k][l] for j in J for k in K for l in L) == 1
@@ -153,14 +169,82 @@ for i in I:
 for j,k,l in product(J,K,L):
   model += xsum(x[i][j][k][l] for i in I) <= 1
 
+#NB Hochpal muss unten stehen
+model += xsum(h[i]*x[i][1][k][l] for i in I for k in K for l in L) == 0
 
-#optimize
-model.optimize()
+#NB Reihe über Hochpal frei
+for i,k,l in product(I,K,L):
+  model += h[i]*x[i][0][k][l] + h[i]*xsum(x[i_s][1][k][l_s] for l_s in L for i_s in I if i_s != i) <= 1+M*(1-x[i][0][k][l])
+
+#NB Ladebalken Reihe oben max. 2t
+for k in K:
+  model += xsum(m[i]*x[i][1][k][l] for i in I for l in L) <= 2000
+
+#NB zuerst unten voll
+model += xsum(x[i][1][k][l] for i in I for k in K for l in L) == Q
+
+#NB unten nur hinten an der Tür frei
+for k,l in product(K[1:],L):
+  model += xsum(x[i][0][k-1][l_s] for i in I for l_s in L) >= xsum(x[i][0][k][l] for i in I)*3
+
+#NB oben kein Freiraum vorne, Y
+#NB oben kein Freiraum hinten, Y
+#NB oben kein Freiraum vorne, W
+#NB oben kein Freiraum hinten, W
+
+#NB Restreihe: bei zwei Paletten muss eine in der Mitte stehen
+for j,k in product(J,K):
+  model += M*xsum(x[i][j][k][1] for i in I) >= xsum(x[i][j][k][l] for i in I for l in L)-1
+
+#NB Restreihe: einzelne Palette darf nicht in der Mitte stehen
+for j,k in product(J,K):
+  model += 2*(xsum(x[i][j][k][0] for i in I)+xsum(x[i][j][k][2] for i in I)) >= xsum(x[i][j][k][l] for i in I for l in L)
+
+#NB Ladungsschwerpunkt Untergrenze
+#NB Ladungsschwerpunkt Obergrenze
+
+#NB Auslieferungsreihenfolge
+for i,i_s,j,j_s,k,l,l_s in product(I,I,J,J,K[1:],L,L):
+  model += x[i][j][k][l]*n[i] <= x[i_s][j_s][k-1][l_s]*n[i_s] + (1-x[i_s][j_s][k-1][l_s])*M
+
+"""#alternativ (falls Freiräume mittig zugelassen werden):
+for i,i_s,j,j_s,k,k_s,l,l_s in product(I,I,J,J,K,K,L,L):
+  if k_s<k:
+    model += x[i][j][k][l]*n[i] <= x[i_s][j_s][k_s][l_s]*n[i_s] + (1-x[i_s][j_s][k_s][l_s])*M"""
+
+#NB kühl-trocken
+
+#NB zur Vorbereitung der Zielfunktion
+model += GL >= xsum(x[i][j][k][0]*m[i] for i in I for j in J for k in K) - xsum(x[i][j][k][2]*m[i] for i in I for j in J for k in K)
+model += GR >= xsum(x[i][j][k][2]*m[i] for i in I for j in J for k in K) - xsum(x[i][j][k][0]*m[i] for i in I for j in J for k in K)
+
+
+#Zielfunktion
+model.objective = minimize(GL+GR)
+
+
+#Zielfunktion vereinfacht: Summe aller x (=P)
+#model.objective = maximize(xsum(x[i][j][k][l] for i in I for j in J for k in K for l in L))
+
+
+#Optimierung mit Abbruchkriterien
+model.max_mip_gap_abs = 0.1
+model.max_solutions = 1
+status = model.optimize() #max_seconds_same_incumbent=60
+
 
 if model.num_solutions: #nur wenn überhaupt eine Lösung gefunden wurde
-    print('Lösung gefunden')
-    #for i,j,k,l in product(I,J,K,L):
-      #print(x[i][j][k][l].x)
+    print('\nLösung gefunden, Status:',status)
+    #print('Summe über alle x =',xsum(x[i][j][k][l] for i in I for j in J for k in K for l in L).x)
+    print('ZFW =',GL+GR)
+    print(model.num_solutions)
+    print('\n')
 
-    print('Summe über alle x =',xsum(x[i][j][k][l] for i in I for j in J for k in K for l in L).x)
+    for i,j,k,l in product(I,J,K,L):
+      if x[i][j][k][l].x >= 0.99:
+        print('x({},{},{},{})'.format(i,j,k,l))
+
+else:
+  print('nichts gefunden')
+  print('Letzter Status:',status)
 
