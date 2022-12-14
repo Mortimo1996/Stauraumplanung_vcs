@@ -16,23 +16,18 @@ import timeit
 
 #https://www.youtube.com/watch?v=0WRMYdOwHYE
 def start():
-    buttonlock = False
-    tasks = 10  # In unserem Beispiel könnten das die Rechenoperationen sein, welche wir zu der Zeit durchlaufen
-    x = 0  # x stellt die Rechenoperation dar, welche gerade ausgeführt wird
-    if buttonlock == False:
-        while (x < tasks):
-            time.sleep(1)
-            bar['value'] += 10 # die zehn sind hier ein Beispiel, wenn es 5 Operationen wären bspw 20
-            x += 1  # inkrementieren nach jeder ausgeführten Rechenoperation
-            percent.set(str((x / tasks) * 100) + "%")
-            button.configure(state=DISABLED)
-            window.update()
-
-
+    tasks = 10 #In unserem Beispiel könnten das die Rechenoperationen sein, welche wir zu der Zeit durchlaufen
+    x = 0 #x stellt die Rechenoperation dar, welche gerade ausgeführt wird
+    button['state']='disabled'
+    while (x < tasks):
+        time.sleep(1)
+        bar['value'] += 10 #die zehn sind hier ein Beispiel, wenn es 5 Operationen wären bspw 20
+        x+=1 #inkrementieren nach jeder ausgeführten Rechenoperation
+        percent.set(str((x/tasks)*100)+"%")
+        window.update_idletasks()
 
 def quit():
     window.destroy()
-
 
 window = Tk()
 window.title("Stauraumplanung")
@@ -46,12 +41,15 @@ window.eval('tk::PlaceWindow . center')
 
 
 percent = StringVar()
-bar = Progressbar(window, orient=HORIZONTAL, length=400)
+bar = Progressbar(window,orient=HORIZONTAL,length=400)
 bar.pack(pady=10)
 
-percentlabel = Label(window, textvariable=percent).pack()
-button = Button(window, text="Download", command=start).pack(pady=10)
-button2 = Button(window,text="Close",command=quit).pack()
+percentlabel = Label(window,textvariable=percent).pack()
+button = Button(window,text="Download",command=start)
+button2 = Button(window,text="Close",command=quit)
+
+button.pack() #evtl pack(pady=10)
+button2.pack()
 
 window.mainloop()
 
@@ -229,14 +227,14 @@ model.objective = minimize(GL+GR)
 
 #Optimierung mit Abbruchkriterien
 model.max_mip_gap_abs = 0.1
-model.max_solutions = 1
-status = model.optimize() #max_seconds_same_incumbent=60
+#model.max_solutions = 1
+status = model.optimize() #max_seconds_same_incumbent=60    max_nodes=25
 
 
 if model.num_solutions: #nur wenn überhaupt eine Lösung gefunden wurde
     print('\nLösung gefunden, Status:',status)
     #print('Summe über alle x =',xsum(x[i][j][k][l] for i in I for j in J for k in K for l in L).x)
-    print('ZFW =',GL+GR)
+    print('ZFW =',GL.x+GR.x)
     print(model.num_solutions)
     print('\n')
 
@@ -245,6 +243,6 @@ if model.num_solutions: #nur wenn überhaupt eine Lösung gefunden wurde
         print('x({},{},{},{})'.format(i,j,k,l))
 
 else:
-  print('nichts gefunden')
-  print('Letzter Status:',status)
+  print('\n\nnichts gefunden')
+  print('Letzter Status:',status,'\n')
 
