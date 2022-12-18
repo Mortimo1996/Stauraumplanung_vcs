@@ -73,7 +73,7 @@ import numpy as np
 #______________________________________________________________________________________________________
 #### Schach-Beispiel ####
 # number of queens
-n = 40
+"""n = 40
 
 queens = Model()
 
@@ -105,7 +105,7 @@ if queens.num_solutions:
     for i, v in enumerate(queens.vars):
         stdout.write('O ' if v.x >= 0.99 else '. ')
         if i % n == n-1:
-            stdout.write('\n')
+            stdout.write('\n')"""
 
 
 """#Abfragen zum Testen im Notebook
