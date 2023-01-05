@@ -129,26 +129,16 @@ tourenlaengen
 # In[9]:
 
 
-tour_nr_04587
-
-# In[10]:
-
-
 h04587 = list(np.zeros(len(tour_nr_04587['n_i'])))
 h04587[10] = 1
-h04587[42] = 1
-
-# In[11]:
-
-
+h04587[11] = 1
 tour_nr_04587['h_i'] = h04587
-tour_nr_04587
 
 
 # In[ ]:
 
 
-# In[12]:
+# In[10]:
 
 
 def plan_fuellen(tabelle, lkwplan, anz_pal, oben, option):
@@ -170,9 +160,7 @@ def plan_fuellen(tabelle, lkwplan, anz_pal, oben, option):
                 col_b += 1
 
             if col_b >= lkwplan.shape[1]:
-                print(
-                    'Keine Zuweisung ab Palette {} (d.h. ab Reihenindex {}) möglich.'.format(tabelle.loc[idx_pal, 'i'],
-                                                                                             idx_pal))
+                # print('Keine Zuweisung ab Palette {} (d.h. ab Reihenindex {}) möglich.'.format(tabelle.loc[idx_pal,'i'],idx_pal))
                 break
 
             if row_b == 0 and tabelle.loc[idx_pal:idx_pal + 6, 'h_i'].sum() >= 1:
@@ -207,9 +195,7 @@ def plan_fuellen(tabelle, lkwplan, anz_pal, oben, option):
                 col_a += 1
 
             if col_a >= lkwplan.shape[1]:
-                print(
-                    'Keine Zuweisung ab Palette {} (d.h. ab Reihenindex {}) möglich.'.format(tabelle.loc[idx_pal, 'i'],
-                                                                                             idx_pal))
+                # print('Keine Zuweisung ab Palette {} (d.h. ab Reihenindex {}) möglich.'.format(tabelle.loc[idx_pal,'i'],idx_pal))
                 break
 
             if row_idx == 0 and tabelle.loc[idx_pal:idx_pal + 6, 'h_i'].sum() >= 1:
@@ -252,9 +238,7 @@ def plan_fuellen(tabelle, lkwplan, anz_pal, oben, option):
                     row_opt = [0, 1, 2, 3, 4, 5]
 
             if col_d >= lkwplan.shape[1]:
-                print(
-                    'Keine Zuweisung ab Palette {} (d.h. ab Reihenindex {}) möglich.'.format(tabelle.loc[idx_pal, 'i'],
-                                                                                             idx_pal))
+                # print('Keine Zuweisung ab Palette {} (d.h. ab Reihenindex {}) möglich.'.format(tabelle.loc[idx_pal,'i'],idx_pal))
                 break
 
             nr = randint(0, len(row_opt) - 1)  # randint(0,5) zieht eine zufällige Zahl von 0 bis 5 (inkl. 0 und 5)
@@ -271,7 +255,7 @@ def plan_fuellen(tabelle, lkwplan, anz_pal, oben, option):
             row_opt.remove(row_opt[nr])
 
 
-# In[13]:
+# In[11]:
 
 
 def gewichte_bestimmen(tabelle_g, lkwplan_g):  # wird von Funktion "plan_bewertung" aufgerufen
@@ -296,7 +280,7 @@ def gewichte_bestimmen(tabelle_g, lkwplan_g):  # wird von Funktion "plan_bewertu
     return zeilensummen, spaltensummen, spaltensum_oben
 
 
-# In[14]:
+# In[12]:
 
 
 def plan_bewertung(tabelle_, lkwplan_):
@@ -309,7 +293,7 @@ def plan_bewertung(tabelle_, lkwplan_):
 
     # R idx0: Anzahl nicht eingeplanter Paletten (0 = am besten)
     # R idx1: alle Hochpaletten haben einen zulässigen Platz (stehen unten & obere Reihe komplett leer)
-    # .> +0.01, wenn HPal nicht unten steht; +1, wenn oben nicht frei ist
+    # .> +0.01, wenn HPal nicht unten steht; +1, wenn über einer HPal nicht frei ist
     # .> durch diese Werte könnte man hinterher auswerten, was das Problem ist - brauchen wir das?
     # R idx2: kühl-trocken-Trennung auch nach Austausch berücksichtigt
     # .> eigener idx sinnvoll, da dies ggf später vernachlässigt werden darf
@@ -455,6 +439,9 @@ def plan_bewertung(tabelle_, lkwplan_):
 
             col_idx += 1
 
+        if typwechsel - 1 == 0 and (lkwplan_.iloc[rows, 0] == 'x').any():
+            typwechsel = 1.0001
+
         bewertung[3] = typwechsel - 1
 
     return bewertung
@@ -463,17 +450,26 @@ def plan_bewertung(tabelle_, lkwplan_):
 # In[ ]:
 
 
-# In[15]:
+# In[13]:
 
 
 # FÜR JEDE TOUR EINZELN:
-tabelle = pd.DataFrame({'i': np.arange(46), 'n_i': tour_nr_04587['n_i'], 'h_i': tour_nr_04587['h_i'],
-                        'm_i': tour_nr_04587['m_i'], 't_i': tour_nr_04587['t_i']})
+"""tabelle=pd.DataFrame({'i': np.arange(46), 'n_i': tour_nr_04587['n_i'], 'h_i': tour_nr_04587['h_i'],
+                      'm_i': tour_nr_04587['m_i'], 't_i': tour_nr_04587['t_i']})"""
 
-# In[ ]:
+tour_idx = 4
+tabelle = pd.DataFrame({'i': np.arange(len(paletten_je_tour[tour_idx]['n_i'])),
+                        'n_i': paletten_je_tour[tour_idx]['n_i'],
+                        'h_i': paletten_je_tour[tour_idx]['h_i'],
+                        'm_i': paletten_je_tour[tour_idx]['m_i'],
+                        't_i': paletten_je_tour[tour_idx]['t_i']})
+
+# In[14]:
 
 
-# In[16]:
+sum(tabelle['m_i'])
+
+# In[15]:
 
 
 # Annahmen vorab
@@ -510,13 +506,13 @@ lsp_o = min(m_t_max / m_lad * radstand_trailer + abst_kp_stw_trailer, abst_kp_st
 
 print(f'Untergrenze (in m ab Stirnwand): {lsp_u:.3f} \nObergrenze (in m ab Stirnwand): {lsp_o:.3f}')
 
-# In[17]:
+# In[16]:
 
 
 lkwplan = pd.DataFrame({str(reihe_k): ['o' for o in range(6)] for reihe_k in range(1, 12)})
 lkwplan
 
-# In[18]:
+# In[17]:
 
 
 varianten = {'A': {'by': ['n_i', 't_i', 'm_i'],
@@ -530,7 +526,7 @@ varianten = {'A': {'by': ['n_i', 't_i', 'm_i'],
 
 plaene = []
 
-# In[19]:
+# In[18]:
 
 
 anz_pal = max(tabelle['i']) + 1  # da Tabelle nullbasiert
@@ -576,7 +572,7 @@ for var in varianten:
             plan_fuellen(tabelle, plaene[-2][0], anz_pal, oben, planoption)
             plaene[-2][1] = plan_bewertung(tabelle, plaene[-2][0])
 
-# In[20]:
+# In[19]:
 
 
 plaene_zweitewahl = []
@@ -595,14 +591,57 @@ while pl1 < len(plaene):
 # Pläne in Erst- und Zweitwahl aufteilen
 pl = 0
 while pl < len(plaene):
-    if sum(plaene[pl][1][0:6]) != 0:
+    if sum(plaene[pl][1][0:6]) > 0.0001:
         plaene_zweitewahl.append(plaene.pop(pl))
     else:
         pl += 1
 
+
+# In[20]:
+
+
+def sort_erstewahl_a(e):
+    return e[1][3]
+
+
+def sort_erstewahl_b(e):
+    return sum(e[1])
+
+
+plaene.sort(key=sort_erstewahl_a)
+plaene.sort(key=sort_erstewahl_b)
+
 plaene
 
+
 # In[21]:
+
+
+# R idx0: Anzahl nicht eingeplanter Paletten (0 = am besten)
+# R idx1: alle Hochpaletten haben einen zulässigen Platz (stehen unten & obere Reihe komplett leer)
+# .> +0.01, wenn HPal nicht unten steht; +1, wenn über einer HPal nicht frei ist
+# .> durch diese Werte könnte man hinterher auswerten, was das Problem ist - brauchen wir das?
+# R idx2: kühl-trocken-Trennung auch nach Austausch berücksichtigt
+# .> eigener idx sinnvoll, da dies ggf später vernachlässigt werden darf
+# R idx3: Anz zusätzl benötigter Ladungssicherung durch ganz freie Reihen mittendrin
+# .> ideal wäre NUR vorne oder NUR hinten ganze Reihen frei - 1x Ladungssicherung ist also ideal
+##### bisher nur oben möglich, falls HP unten -> andere Möglichkeiten ggf. noch ergänzen (?)
+
+# G idx4: Ladebalkenbelastung eingehalten (max. 2 t pro 3er-Reihe oben)
+# G idx5: Achslastvorgaben einhalten!
+# G idx6: Gewichtsdifferenz
+
+
+# In[22]:
+
+
+def sort_zweitewahl(e):
+    return sum(e[1])
+
+
+plaene_zweitewahl.sort(key=sort_zweitewahl)
+
+# In[23]:
 
 
 plaene_zweitewahl
@@ -610,7 +649,7 @@ plaene_zweitewahl
 # In[ ]:
 
 
-# In[22]:
+# In[24]:
 
 
 # TODO:
@@ -619,10 +658,16 @@ plaene_zweitewahl
 # ansonsten auch noch mit plaene_zweitewahl beschäftigen
 
 
-# In[23]:
+# In[25]:
+
+
+if len(plaene) > 0:
+    print(f'Beste gefundene Lösung:\n\n{plaene[0][0]}\n\nGewichtsdifferenz:{plaene[0][1][-1]: .2f} kg')
+else:
+    print('Noch keine optimale Lösung gefunden.')
+
+# In[26]:
 
 
 print(f'bisherige Dauer:{time.time() - starttime: .3f} s')
-
-# In[ ]:
 
