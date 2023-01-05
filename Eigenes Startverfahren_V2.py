@@ -136,7 +136,7 @@ tour_nr_04587
 
 h04587 = list(np.zeros(len(tour_nr_04587['n_i'])))
 h04587[10] = 1
-h04587[11] = 1
+h04587[42] = 1
 
 # In[11]:
 
@@ -300,90 +300,108 @@ def gewichte_bestimmen(tabelle_g, lkwplan_g):  # wird von Funktion "plan_bewertu
 
 
 def plan_bewertung(tabelle_, lkwplan_):
-    bewertung = [0 for i in range(6)]  # erzeugt Liste mit 6 Nullen, 0 bedeutet "alles gut"
+    bewertung = [0 for i in range(7)]  # erzeugt Liste mit 7 Nullen, 0 bedeutet "alles gut"
 
     # ---kein idx, da im Startverf.: Restreihe ist "an der Tür"
     # ---kein idx, da in Verbesserung: Restreihe_einzeln am Rand, zwei mittig&Rand
     # ---kein idx, da im Startverf.: oben stehen genau Q Paletten
     # ---kein idx, da Start&Verbesserung berücksichtigen: Auslieferungsreihenfolge
 
-    # R idx0: alle Hochpaletten haben einen zulässigen Platz (stehen unten & obere Reihe komplett leer)
+    # R idx0: Anzahl nicht eingeplanter Paletten (0 = am besten)
+    # R idx1: alle Hochpaletten haben einen zulässigen Platz (stehen unten & obere Reihe komplett leer)
     # .> +0.01, wenn HPal nicht unten steht; +1, wenn oben nicht frei ist
     # .> durch diese Werte könnte man hinterher auswerten, was das Problem ist - brauchen wir das?
-    # R idx1: kühl-trocken-Trennung auch nach Austausch berücksichtigt
+    # R idx2: kühl-trocken-Trennung auch nach Austausch berücksichtigt
     # .> eigener idx sinnvoll, da dies ggf später vernachlässigt werden darf
-    # R idx2: Anz zusätzl benötigter Ladungssicherung durch ganz freie Reihen mittendrin
+    # R idx3: Anz zusätzl benötigter Ladungssicherung durch ganz freie Reihen mittendrin
     # .> ideal wäre NUR vorne oder NUR hinten ganze Reihen frei - 1x Ladungssicherung ist also ideal
     ##### bisher nur oben möglich, falls HP unten -> andere Möglichkeiten ggf. noch ergänzen (?)
 
-    # G idx3: Ladebalkenbelastung eingehalten (max. 2 t pro 3er-Reihe oben)
-    # G idx4: Achslastvorgaben einhalten!
-    # G idx5: Gewichtsdifferenz
+    # G idx4: Ladebalkenbelastung eingehalten (max. 2 t pro 3er-Reihe oben)
+    # G idx5: Achslastvorgaben einhalten!
+    # G idx6: Gewichtsdifferenz
 
     # --------------------------------------------------------------------------------------
     # für die G-Teile (Gewichte):
     z_sum, sp_sum, sp_sum_oben = gewichte_bestimmen(tabelle_, lkwplan_)
 
-    # G idx3: Ladebalkenbelastung eingehalten (max. 2 t pro 3er-Reihe oben)
+    # G idx4: Ladebalkenbelastung eingehalten (max. 2 t pro 3er-Reihe oben)
     ladebalken_ueberl_col = []
     for col in sp_sum_oben.index:
         if sp_sum_oben[col] > 2000:
             ladebalken_ueberl_col.append(col)
-            bewertung[3] = 1
+            bewertung[4] = 1
 
-    # G idx4: Achslastvorgaben einhalten!
+    # G idx5: Achslastvorgaben einhalten!
     zaehler = 0
     for l in range(0, 11):
         zaehler += (0.6 + 1.2 * l) * sp_sum[l]
     ladungsschw = zaehler / sum(sp_sum)
 
     if lsp_u > ladungsschw or lsp_o < ladungsschw:
-        bewertung[4] = 1  # Ladungsschwerpunkt außerhalb des zulässigen Bereichs, Achslasten nicht eingehalten
+        bewertung[5] = 1  # Ladungsschwerpunkt außerhalb des zulässigen Bereichs, Achslasten nicht eingehalten
 
-    # G idx5: Gewichtsdifferenz
+    # G idx6: Gewichtsdifferenz
     gew_rechts = z_sum[0] + z_sum[3]
     gew_links = z_sum[2] + z_sum[5]
 
-    bewertung[5] = abs(gew_rechts - gew_links)
+    bewertung[6] = abs(gew_rechts - gew_links)
 
     # --------------------------------------------------------------------------------------
     # für die R-Teile (räumlich):
 
-    # R idx0: alle Hochpaletten haben einen zulässigen Platz (stehen unten & obere Reihe komplett leer)
+    # R idx0: Anzahl nicht eingeplanter Paletten (0 = am besten)
+    freieplaetze = 0
+    for col_idx in range(lkwplan_.shape[1]):
+        for row_idx in range(lkwplan_.shape[0]):
+            if type(lkwplan_.iloc[row_idx, col_idx]) == str:
+                freieplaetze += 1
+
+    bewertung[0] = freieplaetze - (66 - anz_pal)
+
+    # R idx1: alle Hochpaletten haben einen zulässigen Platz (stehen unten & obere Reihe komplett leer)
     hpaletten = tabelle_[tabelle_['h_i'] > 0].reset_index(inplace=False, drop=True)
 
     for hpal in range(hpaletten.shape[0]):  # für jede HPal einzeln, daher rowhp und colhp immer nur ein Element
 
-        rowhp = list(lkwplan_[lkwplan_.isin([hpaletten.loc[hpal, 'i']]).any(axis=1)].index)[0]
-        if rowhp >= 3:
-            bewertung[0] += 0.01
+        try:
+            rowhp = list(lkwplan_[lkwplan_.isin([hpaletten.loc[hpal, 'i']]).any(axis=1)].index)[0]
+            colhp = str(list(lkwplan_.columns[lkwplan_.isin([hpaletten.loc[hpal, 'i']]).any()])[0])
+        except:
+            bewertung[1] = 100  # 100 als Kennzeichen, dass HPal nicht mehr eingeplant werden konnte
+        else:
+            if rowhp >= 3:  # falls eine HPal oben steht
+                bewertung[1] += 0.01
 
-        colhp = str(list(lkwplan_.columns[lkwplan_.isin([hpaletten.loc[hpal, 'i']]).any()])[0])
-        # Spaltensumme der Gewichte in Zeilen [3:] sollte == 0 sein
-        if sp_sum_oben[colhp] != 0:
-            bewertung[0] += 1
+            # Spaltensumme der Gewichte in Zeilen [3:] sollte == 0 sein (= oben frei)
+            if sp_sum_oben[colhp] != 0:
+                bewertung[1] += 1
 
-    # R idx1: kühl-trocken-Trennung auch nach Austausch berücksichtigt
+    # R idx2: kühl-trocken-Trennung auch nach Austausch berücksichtigt
     kuehlpaletten = tabelle_[tabelle_['t_i'] > 0].reset_index(inplace=False, drop=True)
 
     for tpal in range(kuehlpaletten.shape[0]):  # für jede Kühlpalette einzeln
-        col_tpal = int(list(lkwplan_.columns[lkwplan_.isin([kuehlpaletten.loc[tpal, 'i']]).any()])[0])
 
-        # alle n in der nächsthöheren Reihe müssen kleiner sein ODER gleich wenn t auch 1 ist
-        tabelle_vgl = tabelle_.set_index('i', inplace=False, drop=False)
-        if col_tpal <= 10:
-            for jedes in lkwplan_.loc[:, str(col_tpal + 1)]:
+        try:
+            col_tpal = int(list(lkwplan_.columns[lkwplan_.isin([kuehlpaletten.loc[tpal, 'i']]).any()])[0])
+        except:
+            bewertung[2] = 100  # 100 als Kennzeichen, dass Kühlpalette nicht mehr eingeplant werden konnte
+        else:
+            # alle n in der nächsthöheren Reihe müssen kleiner sein ODER gleich wenn t auch 1 ist
+            tabelle_vgl = tabelle_.set_index('i', inplace=False, drop=False)
+            if col_tpal <= 10:
+                for jedes in lkwplan_.loc[:, str(col_tpal + 1)]:
 
-                if jedes != 'x' and jedes != 'o':
+                    if jedes != 'x' and jedes != 'o':
 
-                    if tabelle_vgl.loc[jedes, 'n_i'] > tabelle_vgl.loc[kuehlpaletten.loc[tpal, 'i'], 'n_i']:
-                        bewertung[1] = 2  # das kann eigentlich nicht passieren; abh. von Verb.verf.
+                        if tabelle_vgl.loc[jedes, 'n_i'] > tabelle_vgl.loc[kuehlpaletten.loc[tpal, 'i'], 'n_i']:
+                            bewertung[2] = 2  # das kann eigentlich nicht passieren; abh. von Verb.verf.
 
-                    elif tabelle_vgl.loc[jedes, 'n_i'] == tabelle_vgl.loc[kuehlpaletten.loc[tpal, 'i'], 'n_i']:
-                        if tabelle_vgl.loc[jedes, 't_i'] < 1:
-                            bewertung[1] = 1
+                        elif tabelle_vgl.loc[jedes, 'n_i'] == tabelle_vgl.loc[kuehlpaletten.loc[tpal, 'i'], 'n_i']:
+                            if tabelle_vgl.loc[jedes, 't_i'] < 1:
+                                bewertung[2] = 1
 
-    # R idx2: Anz zusätzl benötigter Ladungssicherung durch ganz freie Reihen mittendrin
+    # R idx3: Anz zusätzl benötigter Ladungssicherung durch ganz freie Reihen mittendrin
 
     # zähle Typwechsel hoch, wenn man von Paletten auf ganz leere Reihe wechselt oder umgekehrt
     # Typwechsel entspricht damit Anz. benötigter Ladungssicherung
@@ -437,7 +455,7 @@ def plan_bewertung(tabelle_, lkwplan_):
 
             col_idx += 1
 
-        bewertung[2] = typwechsel - 1
+        bewertung[3] = typwechsel - 1
 
     return bewertung
 
@@ -577,7 +595,7 @@ while pl1 < len(plaene):
 # Pläne in Erst- und Zweitwahl aufteilen
 pl = 0
 while pl < len(plaene):
-    if sum(plaene[pl][1][0:5]) != 0:
+    if sum(plaene[pl][1][0:6]) != 0:
         plaene_zweitewahl.append(plaene.pop(pl))
     else:
         pl += 1
@@ -601,13 +619,10 @@ plaene_zweitewahl
 # ansonsten auch noch mit plaene_zweitewahl beschäftigen
 
 
-# kann bei Hochpal sehr schnell zu Zuweisungsproblemen kommen
-# vor allem Fehlermeldungen in der 2. Option des Plans (vorne sperren) müssen abgefangen werden!
-
-
 # In[23]:
 
-print(f'bisherige Dauer in Sekunden: {time.time() - starttime}')
 
+print(f'bisherige Dauer:{time.time() - starttime: .3f} s')
 
 # In[ ]:
+
