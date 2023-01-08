@@ -114,7 +114,7 @@ paletten_je_tour
 # In[7]:
 
 
-tour_nr_04587 = paletten_je_tour[11]
+tour_nr_04587 = dict(paletten_je_tour[11])  # dict() benötigt, um eine Kopie zu erzeugen
 len(tour_nr_04587['n_i'])
 
 # In[8]:
@@ -217,6 +217,7 @@ def plan_fuellen(tabelle, lkwplan, anz_pal, oben, option):
         row_opt = [0, 1, 2, 3, 4, 5]
 
         while idx_pal < anz_pal:
+            restr = False
 
             if oben == 0:
                 for row_c in range(3, 6):
@@ -227,14 +228,16 @@ def plan_fuellen(tabelle, lkwplan, anz_pal, oben, option):
             if len(row_opt) == 0:
                 col_d += 1
 
-                if oben == 2 and anz_pal % 3 == 2:
+                if oben == 2 and anz_pal % 3 == 2:  # Optionen für Restreihe
+                    restr = True
                     if randint(0, 1) == 0:
                         row_opt = [0, 1, 2, 4, 5]
                     else:
                         row_opt = [0, 1, 2, 3, 4]
-                elif oben == 1 and anz_pal % 3 == 1:
+                elif oben == 1 and anz_pal % 3 == 1:  # Optionen für Restreihe
+                    restr = True
                     row_opt = [0, 1, 2, 3, 5]
-                else:
+                else:  # alle anderen außer der Restreihe
                     row_opt = [0, 1, 2, 3, 4, 5]
 
             if col_d >= lkwplan.shape[1]:
@@ -243,7 +246,7 @@ def plan_fuellen(tabelle, lkwplan, anz_pal, oben, option):
 
             nr = randint(0, len(row_opt) - 1)  # randint(0,5) zieht eine zufällige Zahl von 0 bis 5 (inkl. 0 und 5)
 
-            if len(row_opt) == 6 and tabelle.loc[idx_pal:idx_pal + 6, 'h_i'].sum() >= 1:
+            if (len(row_opt) == 6 or restr) and tabelle.loc[idx_pal:idx_pal + 6, 'h_i'].sum() >= 1:
                 lkwplan.iloc[3:, col_d] = 'x'
 
             if lkwplan.iloc[row_opt[nr], col_d] != 'x':
@@ -258,20 +261,29 @@ def plan_fuellen(tabelle, lkwplan, anz_pal, oben, option):
 # In[11]:
 
 
-def gewichte_bestimmen(tabelle_g, lkwplan_g):  # wird von Funktion "plan_bewertung" aufgerufen
+def gewichtsplan(tabelle_g,
+                 lkwplan_g):  # wird von Funktion "gewichte_bestimmen" aufgerufen & später nochmal bei Verbesserung
+
     # Indizes von 'tabelle' ändern, damit wir einfacher auf m_i zugreifen können
     tabelle_2 = tabelle_g.set_index('i', inplace=False, drop=False)  # erzeugt eine Kopie
 
     # neue Tabelle bzw. Beladungsplan mit Gewichtsangaben erstellen
-    lkwplan_gewichte = pd.DataFrame(lkwplan_g.copy(deep=True))
+    lkwplan_gew = pd.DataFrame(lkwplan_g.copy(deep=True))
 
-    for col in range(lkwplan_gewichte.shape[1]):
-        for row in range(lkwplan_gewichte.shape[0]):
-            if lkwplan_gewichte.iloc[row, col] != 'x' and lkwplan_gewichte.iloc[row, col] != 'o':
-                lkwplan_gewichte.iloc[row, col] = tabelle_2.loc[lkwplan_gewichte.iloc[row, col], 'm_i']
+    for col in range(lkwplan_gew.shape[1]):
+        for row in range(lkwplan_gew.shape[0]):
+            if lkwplan_gew.iloc[row, col] != 'x' and lkwplan_gew.iloc[row, col] != 'o':
+                lkwplan_gew.iloc[row, col] = tabelle_2.loc[lkwplan_gew.iloc[row, col], 'm_i']
             else:
-                lkwplan_gewichte.iloc[
+                lkwplan_gew.iloc[
                     row, col] = 0  # Alternative hierzu wäre z. B. lkwplan_gewichte.replace('x',0,inplace=True)
+
+    return lkwplan_gew
+
+
+def gewichte_bestimmen(tabelle_gb, lkwplan_gb):  # wird von Funktion "plan_bewertung" aufgerufen
+
+    lkwplan_gewichte = gewichtsplan(tabelle_gb, lkwplan_gb)
 
     spaltensum_oben = lkwplan_gewichte.loc[3:].sum(axis=0)
     spaltensummen = lkwplan_gewichte.sum(axis=0)
@@ -299,7 +311,8 @@ def plan_bewertung(tabelle_, lkwplan_):
     # .> eigener idx sinnvoll, da dies ggf später vernachlässigt werden darf
     # R idx3: Anz zusätzl benötigter Ladungssicherung durch ganz freie Reihen mittendrin
     # .> ideal wäre NUR vorne oder NUR hinten ganze Reihen frei - 1x Ladungssicherung ist also ideal
-    ##### bisher nur oben möglich, falls HP unten -> andere Möglichkeiten ggf. noch ergänzen (?)
+    # .> für NUR vorne ganze Reihen frei trotzdem noch +0.0001 ergänzt, da dann NUR hinten noch bevorzugt werden kann
+    ##### bisher nur Sperrungen oben möglich, wenn HP unten -> andere Möglichkeiten ggf. noch ergänzen (?)
 
     # G idx4: Ladebalkenbelastung eingehalten (max. 2 t pro 3er-Reihe oben)
     # G idx5: Achslastvorgaben einhalten!
@@ -326,10 +339,17 @@ def plan_bewertung(tabelle_, lkwplan_):
         bewertung[5] = 1  # Ladungsschwerpunkt außerhalb des zulässigen Bereichs, Achslasten nicht eingehalten
 
     # G idx6: Gewichtsdifferenz
-    gew_rechts = z_sum[0] + z_sum[3]
+    """gew_rechts=z_sum[0]+z_sum[3]
+    gew_links=z_sum[2]+z_sum[5]
+    bewertung[6]=abs(gew_rechts-gew_links)  """
+
+    # Gewichtsdifferenz NEU: in %
+    # gew_rechts=z_sum[0]+z_sum[3]
+    gew_mitte = z_sum[1] + z_sum[4]
     gew_links = z_sum[2] + z_sum[5]
 
-    bewertung[6] = abs(gew_rechts - gew_links)
+    prozent_links = (gew_links + gew_mitte / 2) / sum(z_sum) * 100
+    bewertung[6] = abs(50 - prozent_links) * 2
 
     # --------------------------------------------------------------------------------------
     # für die R-Teile (räumlich):
@@ -392,10 +412,10 @@ def plan_bewertung(tabelle_, lkwplan_):
     # rechne zum Schluss -1, da ein Wechsel i. O. (entspricht der Ideallösung)
 
     # entscheidende Typwechsel nur bei folgender Palettenanzahl möglich:
-    if anz_pal <= 27 or (anz_pal >= 34 and anz_pal <= 60):
+    if anz_pal - bewertung[0] <= 27 or (anz_pal - bewertung[0] >= 34 and anz_pal - bewertung[0] <= 60):
 
         # bei mehr als 33 Paletten zählen wir Typwechsel nur oben, ansonsten nur unten
-        if anz_pal > 33:
+        if anz_pal - bewertung[0] > 33:
             rows = [3, 4, 5]
         else:
             rows = [0, 1, 2]
@@ -457,7 +477,7 @@ def plan_bewertung(tabelle_, lkwplan_):
 """tabelle=pd.DataFrame({'i': np.arange(46), 'n_i': tour_nr_04587['n_i'], 'h_i': tour_nr_04587['h_i'],
                       'm_i': tour_nr_04587['m_i'], 't_i': tour_nr_04587['t_i']})"""
 
-tour_idx = 4
+tour_idx = 4  # 11 hat wieder die richtigen h_i-Werte; bei 8 noch testen wieso zwei zweitewahl keine 100 für h_i erhalten
 tabelle = pd.DataFrame({'i': np.arange(len(paletten_je_tour[tour_idx]['n_i'])),
                         'n_i': paletten_je_tour[tour_idx]['n_i'],
                         'h_i': paletten_je_tour[tour_idx]['h_i'],
@@ -469,19 +489,22 @@ tabelle = pd.DataFrame({'i': np.arange(len(paletten_je_tour[tour_idx]['n_i'])),
 
 sum(tabelle['m_i'])
 
+# In[ ]:
+
+
 # In[15]:
 
 
 # Annahmen vorab
-# benötigte Werte: (hier am Bsp. Zugmaschine MAN + Dry Liner KRONE)
-radstand_trailer = 7.63
+# benötigte Werte: (hier am Bsp. Zugmaschine MAN + Cool Liner KRONE)
+radstand_trailer = 7.46
 radstand_tractor = 3.6
 sattelvorm_tractor = 0.575  # Kingpin 575 mm vor Hinterachse
-abst_kp_stw_trailer = 1.65
+abst_kp_stw_trailer = 1.45
 m_tractor = 7943
-m_trailer = 7890
+m_trailer = 8590
 massenschw_vorHA_tractor = 2.538
-massenschw_zuStw_trailer = 7.249  # Abstand zur Stirnwand (hier leicht gerundet, s. Excel)
+massenschw_zuStw_trailer = 6.609  # Abstand zur Stirnwand (hier leicht gerundet, s. Excel)
 m_HA_max_ges = 11500  # gesetzliche Vorgabe
 m_t_max_ges = 24000  # gesetzliche Vorgabe
 
@@ -605,16 +628,24 @@ def sort_erstewahl_a(e):
 
 
 def sort_erstewahl_b(e):
-    return sum(e[1])
+    return e[1][-1]
 
 
-plaene.sort(key=sort_erstewahl_a)
-plaene.sort(key=sort_erstewahl_b)
+def plaene_erstewahl_sort(plaene_):
+    plaene_.sort(key=sort_erstewahl_a)
+    plaene_.sort(key=sort_erstewahl_b)
+    return plaene_
 
+
+plaene = plaene_erstewahl_sort(plaene)
 plaene
 
-
 # In[21]:
+
+
+0.376 / 100 * sum(tabelle['m_i'])
+
+# In[22]:
 
 
 # R idx0: Anzahl nicht eingeplanter Paletten (0 = am besten)
@@ -625,49 +656,269 @@ plaene
 # .> eigener idx sinnvoll, da dies ggf später vernachlässigt werden darf
 # R idx3: Anz zusätzl benötigter Ladungssicherung durch ganz freie Reihen mittendrin
 # .> ideal wäre NUR vorne oder NUR hinten ganze Reihen frei - 1x Ladungssicherung ist also ideal
-##### bisher nur oben möglich, falls HP unten -> andere Möglichkeiten ggf. noch ergänzen (?)
+# .> für NUR vorne ganze Reihen frei trotzdem noch +0.0001 ergänzt, da dann NUR hinten noch bevorzugt werden kann
+##### bisher nur Sperrungen oben möglich, wenn HP unten -> andere Möglichkeiten ggf. noch ergänzen (?)
 
 # G idx4: Ladebalkenbelastung eingehalten (max. 2 t pro 3er-Reihe oben)
 # G idx5: Achslastvorgaben einhalten!
 # G idx6: Gewichtsdifferenz
 
 
-# In[22]:
-
-
-def sort_zweitewahl(e):
-    return sum(e[1])
-
-
-plaene_zweitewahl.sort(key=sort_zweitewahl)
-
 # In[23]:
 
 
-plaene_zweitewahl
+# Welcher Index-Verstoß ist am schlimmsten?
 
-# In[ ]:
+# idx0 und idx4 müssen unbedingt 0 sein - aber idx4 kann man ggf. leicht verbessern
+# idx1 kann eigentlich nicht mehr passieren (deshalb ignorieren?)
+# idx2 und idx3 sollten möglichst minimal sein, dürften aber ggf. verletzt werden (wenn sonst keine Lösung zu finden ist)
+# idx5 muss möglichst eingehalten werden - diese Verletzung vielleicht bei "trotzdem Lsg ausgeben" zulassen?
+# idx6 darf nur den Maximalverstoß nicht überschreiten, um noch als zulässig zu gelten
 
 
 # In[24]:
 
 
-# TODO:
-# Verbesserungsverfahren zunächst nur für plaene (falls Einträge enthalten)
-# wenn das schon zu sehr gutem Ergebnis führt (Vorgaben ausstehend): aufhören
-# ansonsten auch noch mit plaene_zweitewahl beschäftigen
+# plaene_x_ladebalken - "nur" Ladebalken verletzt bzw. idx3 könnte noch 0.0001 sein
+# erstellen wir, wenn es keine als optimal geltenden Pläne gibt
+# dann Verbesserung hierfür mithilfe einer separaten Funktion
+
+# für alles andere wählen wir "zufällige" Palettentausche & schauen einfach, ob wir uns verbessern
 
 
 # In[25]:
 
 
-if len(plaene) > 0:
-    print(f'Beste gefundene Lösung:\n\n{plaene[0][0]}\n\nGewichtsdifferenz:{plaene[0][1][-1]: .2f} kg')
-else:
-    print('Noch keine optimale Lösung gefunden.')
+"""def sort_zweitewahl_a(e):
+    return e[1][-1]
+
+def sort_zweitewahl_b(e):
+    return sum(e[1][:6])
+
+
+def sort_zweitewahl_z(e):
+    return e[1][0]+e[1][4]
+
+def plaene_zweitewahl_sort(plaene_liste):
+    plaene_liste.sort(key=sort_zweitewahl_a)
+    plaene_liste.sort(key=sort_zweitewahl_b)
+    plaene_liste.sort(key=sort_zweitewahl_z)
+
+plaene_zweitewahl_sort(plaene_zweitewahl)
+plaene_zweitewahl"""
+
+
+# plaene_zweitewahl erstmal gar nicht sortieren & stattdessen schauen, ob plaene schon ein ideales Ergebnis hat
+
 
 # In[26]:
 
 
+def gewichte_optimieren(tabelle_, lkwplan_, bewertung_):
+    opt_gewicht = bewertung_[-1]
+    plan_gewichte = gewichtsplan(tabelle_, lkwplan_)
+
+    z_sum = plan_gewichte.sum(axis=1)
+    if z_sum[0] + z_sum[3] > z_sum[2] + z_sum[5]:  # if rechts>links
+        w = 1
+    else:
+        w = -1
+
+    # Tauschpotentiale berechnen: je höher der Wert, desto "besser" (kann ggf. zu viel sein)
+    plan_tauschpotential = pd.DataFrame({str(reihe_k): [0 for o in range(6)] for reihe_k in range(1, 12)})
+    # in plan_tauschpotential berechne in Zeile...
+    # 0 - Differenz 0 u 1
+    # 1 - Differenz 0 u 2
+    # 2 - Differenz 1 u 2
+    # 3 - Differenz 3 u 4
+    # 4 - Differenz 3 u 5
+    # 5 - Differenz 4 u 5
+
+    if anz_pal > 33:
+        rows_rest = [3, 4, 5]
+        rows_total = [0, 1, 2, 3, 4, 5]
+    else:
+        rows_rest = [0, 1, 2]
+        rows_total = [0, 1, 2]
+
+    for col in range(0, plan_tauschpotential.shape[1]):
+        if (plan_tauschpotential.iloc[rows_rest, col] == 0).all():
+            rows_potential = [r for r in rows_total if r not in rows_rest]
+        else:
+            if (plan_tauschpotential.iloc[rows_rest, col] == 0).any():
+                rows_potential = rows_total
+                if anz_pal % 3 == 1:  # dann 0 und 2 bzw. 3 und 5 sperren (abhängig von Ebene der Restreihe)
+                    del rows_potential[-3]
+                    del rows_potential[-1]
+                elif anz_pal % 3 == 2:
+                    if (plan_tauschpotential.iloc[rows_rest[1:], col] == 0).any():
+                        del rows_potential[-1]
+                    else:
+                        del rows_potential[-3]
+
+        for row in rows_potential:
+            if row == 0 or row == 3:
+                plan_tauschpotential.iloc[row, col] = (plan_gewichte.iloc[row, col] - plan_gewichte.iloc[
+                    row + 1, col]) * w
+            elif row == 1 or row == 4:
+                plan_tauschpotential.iloc[row, col] = (plan_gewichte.iloc[row - 1, col] - plan_gewichte.iloc[
+                    row + 1, col]) * w
+            elif row == 2 or row == 5:
+                plan_tauschpotential.iloc[row, col] = (plan_gewichte.iloc[row - 1, col] - plan_gewichte.iloc[
+                    row, col]) * w
+
+    tester = plan_tauschpotential
+
+    diff = bewertung_[-1] / 100 * sum(tabelle['m_i'])
+    best_value = 0
+    best_row = None
+    best_col_str = None
+
+    # finde die Reihe mit dem Wert am nächsten zur aktuellen Gewichtsdifferenz (um möglichst optimal wegzutauschen)
+    for col in tester.columns:
+        v1 = pd.DataFrame(tester.loc[(tester[col] - diff).abs().argsort()[:1]].copy(deep=True))
+        if v1.loc[v1.index[0], col] != 0 and abs(diff - v1.loc[v1.index[0], col]) < abs(diff - best_value):
+            best_row = v1.index[0]
+            best_col_str = col
+            best_value = v1.loc[v1.index[0], col]
+
+    # print(tester,'\n\n')
+
+    if best_row != None and best_col_str != None:
+        # print(tester.loc[best_row,best_col_str])
+        # print(f'row: {best_row}, column: {best_col_str}')
+
+        if best_row == 0 or best_row == 3:
+            speicher = lkwplan_.loc[best_row, best_col_str]
+            lkwplan_.loc[best_row, best_col_str] = lkwplan_.loc[best_row + 1, best_col_str]
+            lkwplan_.loc[best_row + 1, best_col_str] = speicher
+        elif best_row == 1 or best_row == 4:
+            speicher = lkwplan_.loc[best_row - 1, best_col_str]
+            lkwplan_.loc[best_row - 1, best_col_str] = lkwplan_.loc[best_row + 1, best_col_str]
+            lkwplan_.loc[best_row + 1, best_col_str] = speicher
+        elif best_row == 2 or best_row == 5:
+            speicher = lkwplan_.loc[best_row, best_col_str]
+            lkwplan_.loc[best_row, best_col_str] = lkwplan_.loc[best_row - 1, best_col_str]
+            lkwplan_.loc[best_row - 1, best_col_str] = speicher
+
+    # in plan_tauschpotential sagt uns Zeile...
+    # 0 - Differenz 0 u 1
+    # 1 - Differenz 0 u 2
+    # 2 - Differenz 1 u 2
+    # 3 - Differenz 3 u 4
+    # 4 - Differenz 3 u 5
+    # 5 - Differenz 4 u 5
+
+    return lkwplan_
+
+
+# In[27]:
+
+
+def ladebalken_ausgleich(tabelle_, lkwplan_):
+    lkwplan_gewichte = gewichtsplan(tabelle_, lkwplan_)
+    sp_sum_oben = lkwplan_gewichte.loc[3:].sum(axis=0)
+    sp_sum = lkwplan_gewichte.sum(axis=0)
+
+    for idx in range(0, len(sp_sum_oben)):
+        if sp_sum_oben[idx] > 2000:
+            if sp_sum[idx] - sp_sum_oben[idx] <= 2000:  # dann tausche oben und unten komplett
+                speicher = lkwplan_.iloc[:3, idx]
+                lkwplan_.iloc[:3, idx] = lkwplan_.iloc[3:, idx]
+                lkwplan_.iloc[3:, idx] = speicher
+            else:
+                for a in [1, 2]:  # tausche schwerste oben mit leichtester unten (2x)
+                    row_min = lkwplan_gewichte.iloc[:3, idx].idxmin()
+                    row_max = lkwplan_gewichte.iloc[3:, idx].idxmax()
+                    speicher = lkwplan_.iloc[row_min, idx]
+                    lkwplan_.iloc[row_min, idx] = lkwplan_.iloc[row_max, idx]  # gibt Zeilenindex aus
+                    lkwplan_.iloc[row_max, idx] = speicher
+
+    return lkwplan_
+
+
+# In[28]:
+
+
+def plaene_erstewahl_optimieren(tabelle_o, plaene_o):
+    for pl in range(0, len(plaene_o)):
+        plaene_o[pl][0] = gewichte_optimieren(tabelle_o, plaene_o[pl][0], plaene_o[pl][1])
+        plaene_o[pl][1] = plan_bewertung(tabelle_o, plaene_o[pl][0])
+
+    plaene_o = plaene_erstewahl_sort(plaene_o)
+    return plaene_o
+
+
+# In[29]:
+
+
+diff_optimal_ab = 10  # noch zu definierende Grenze, ab der eine Lösung optimal ist (z. B. 10, also 45 % <-> 55 % i.O.)
+diff_zulaessig_ab = 30
+
+"""if len(plaene)>0:
+    if plaene[0][1][-1]<=diff_optimal_ab:
+        pass
+    else:
+        plaene=plaene_erstewahl_optimieren(tabelle,plaene) #sortiert auch direkt"""
+
+if len(plaene) > 0:
+    # könnte schon optimal genug sein (siehe """..."""), können aber auch direkt nochmal optimieren, weil es kaum Zeit kostet
+    plaene = plaene_erstewahl_optimieren(tabelle, plaene)  # sortiert auch direkt
+
+if len(plaene) > 0 and plaene[0][1][-1] <= diff_optimal_ab:
+    # kann es im vorherigen if nicht integrieren, da ansonsten else nicht greift, wenn plaene[0][1][-1]>diff_optimal_ab
+    pass
+else:  # kümmere dich nur um die Verbesserung der Pläne 2. Wahl, wenn es keine passende Erstwahl gibt
+    for pl_idx in range(0, len(plaene_zweitewahl)):
+        # prüfe & verändere zuerst nur Ladebalken-Verstöße
+        if sum(plaene_zweitewahl[pl_idx][1][:3]) + plaene_zweitewahl[pl_idx][1][5] == 0 and \
+                plaene_zweitewahl[pl_idx][1][3] <= 0.001:
+            plaene_zweitewahl[pl_idx][0] = ladebalken_ausgleich(tabelle, plaene_zweitewahl[pl_idx][0])
+            plaene_zweitewahl[pl_idx][1] = plan_bewertung(tabelle, plaene_zweitewahl[pl_idx][0])
+            # Bewertung ggf. überflüssig, wenn nichts getauscht wurde - geht aber weiterhin schnell genug
+            # wenn Bewertung dann keinen Ladebalkenfehler mehr hat, kann Plan zur Erstwahl werden
+            if plaene_zweitewahl[pl_idx][1][4] == 0:
+                plaene.append(plaene_zweitewahl.pop(pl_idx))
+                plaene = plaene_erstewahl_optimieren(tabelle, plaene)
+                if plaene[0][1][-1] <= diff_optimal_ab:
+                    break
+
+    # falls es durch Ladebalken-Veränderungen noch nicht zum break gekommen ist:
+    # starte zufällige Palettenauswahl & zufälligen -tausch mit einer in Frage kommenden anderen Palette
+
+# In[30]:
+
+
+if len(plaene) == 0:
+    print(plaene_zweitewahl)
+
+# In[31]:
+
+
+# R idx1: alle Hochpaletten haben einen zulässigen Platz (stehen unten & obere Reihe komplett leer)
+# .> +0.01, wenn HPal nicht unten steht; +1, wenn über einer HPal nicht frei ist
+# .> durch diese Werte könnte man hinterher auswerten, was das Problem ist - brauchen wir das?
+
+
+# In[32]:
+
+
+tabelle
+
+# In[33]:
+
+
+if len(plaene) > 0:
+    print(
+        f'Beste gefundene Lösung:\n\n{plaene[0][0]}\n\nGewichtsdifferenz*:{plaene[0][1][-1]: .2f} %  -  entspricht ca.{plaene[0][1][-1] / 100 * sum(tabelle["m_i"]): .2f} kg Mehrgewicht auf einer Seite')
+    print('\t*wenn links 45 % und rechts 55 % des Ladungsgewichts stehen, beträgt die Gewichtsdifferenz 10 %')
+else:
+    print('Noch keine optimale Lösung gefunden.')
+
+# In[34]:
+
+
 print(f'bisherige Dauer:{time.time() - starttime: .3f} s')
+
+
 
