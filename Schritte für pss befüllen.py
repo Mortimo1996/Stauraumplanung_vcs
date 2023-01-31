@@ -1198,7 +1198,12 @@ else:
 
 print(f'bisherige Dauer:{time.time() - starttime: .3f} s')
 
-# In[ ]:
+
+
+
+#___________________________________________________
+#TODO:
+
 
 
 # für alle zusammen:
@@ -1239,27 +1244,6 @@ print(f'bisherige Dauer:{time.time() - starttime: .3f} s')
 
 # In[ ]:
 
-
-# In[ ]:
-
-
-# In[ ]:
-
-
-# In[35]:
-
-
-for i in range(len(paletten_je_tour)):
-    tour_idx = i  # 11 hat wieder die richtigen h_i-Werte; bei 8 noch testen wieso zwei zweitewahl keine 100 für h_i erhalten
-    tabelle = pd.DataFrame({'i': np.arange(len(paletten_je_tour[tour_idx]['n_i'])),
-                            'n_i': paletten_je_tour[tour_idx]['n_i'],
-                            'h_i': paletten_je_tour[tour_idx]['h_i'],
-                            'm_i': paletten_je_tour[tour_idx]['m_i'],
-                            't_i': paletten_je_tour[tour_idx]['t_i']})
-
-    print(f'Nummer {i}: {sum(tabelle["m_i"]): .3f}')
-
-# In[ ]:
 
 
 
