@@ -1,0 +1,20 @@
+import pandas as pd
+
+df = pd.read_csv('/Users/maartenvandenboom/IT-Studienprojekt/Laendervorgaben.csv', delimiter=';')
+pd.set_option('display.max_columns', None)
+print(df)
+
+tar_pfad = '/Users/maartenvandenboom/IT-Studienprojekt/tar (1).asc'
+tar = open(tar_pfad, 'r')
+tar_vor = tar.readlines()
+print(tar_vor)
+regionen = []
+for z in tar_vor:
+    regionen.append(z[120:129])
+#noch unklar wo region definiert
+#print(regionen)
+
+pss_pfad = '/Users/maartenvandenboom/IT-Studienprojekt/pss.asc'
+pss = open(pss_pfad, 'r')
+pss_vor = pss.readlines()
+print(pss_vor)
