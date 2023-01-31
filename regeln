@@ -4,8 +4,8 @@ import pandas as pd
 
 # zunächst einmal habe ich mir hier das df ausgeben lassen, das wird im späteren code nicht mehr nötig sein
 df = pd.read_csv('/Users/maartenvandenboom/IT-Studienprojekt/Fahrzeugdefinitionen.csv', delimiter=';')
-pd.set_option('display.max_columns', None)
-print(df)
+#pd.set_option('display.max_columns', None)
+#print(df)
 
 #in einem weiteren schritt werden die spediteure aus der tar gelesen...
 tar_pfad = '/Users/maartenvandenboom/IT-Studienprojekt/tar (1).asc'
@@ -15,8 +15,8 @@ spediteure = []
 regeln = {}
 #und in einer Liste zusammengeführt
 for z in tar_vor:
-    spediteure.append(z[53:93])
-spediteure = [z.strip(' ') for z in spediteure]
+    spediteure.append(z[53:63])
+#spediteure = [z.strip(' ') for z in spediteure]
 #print(spediteure)
 
 df.set_index("Spediteur", inplace = True)
