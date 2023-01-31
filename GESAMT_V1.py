@@ -55,38 +55,37 @@ for z_tar in tar_vor:
                 blkblo_je_tour[idx].append(z_blk[16:23]) #erzeugt dict {idx: [Liste aller Blockauftragsnr.]}
 
         idx += 1
+anzahl_touren=idx
 
 
 paletten_je_tour = {}
-idx = 0
-for z_tar in tar_vor: #nicht in vorherige for-Schleife integrierbar, weil wir blkblo_je_tour benötigen
-    if z_tar[14:16] == 'AR': # ansonsten ist die Tour von uns nicht zu berücksichtigen
-        paletten_je_tour[idx] = {'n_i': [], 'h_i': [], 'm_i': [], 't_i': [], 'zeile': []}
-        zeilennr_pss = 0
-        for z_pss in pss_vor:
+for idx in range(0,anzahl_touren): #nicht in vorherige for-Schleife integrierbar, weil wir blkblo_je_tour benötigen
+    paletten_je_tour[idx] = {'n_i': [], 'h_i': [], 'm_i': [], 't_i': [], 'zeile': []}
+    zeilennr_pss = 0
+    for z_pss in pss_vor:
 
-            if z_pss[25:32] in blkblo_je_tour[idx]: # wenn BLKNR zur aktuell bearbeiteten Tour gehört
-                paletten_je_tour[idx]['n_i'].append(int(blkblo_blktre_blkk02[z_pss[25:32]][0]))
+        if z_pss[25:32] in blkblo_je_tour[idx]: # wenn BLKNR zur aktuell bearbeiteten Tour gehört
+            paletten_je_tour[idx]['n_i'].append(int(blkblo_blktre_blkk02[z_pss[25:32]][0]))
 
-                if int(z_pss[45:55]) > 1070:
-                    paletten_je_tour[idx]['h_i'].append(1)
-                else:
-                    paletten_je_tour[idx]['h_i'].append(0)
+            if int(z_pss[45:55]) > 1070:
+                paletten_je_tour[idx]['h_i'].append(1)
+            else:
+                paletten_je_tour[idx]['h_i'].append(0)
 
-                paletten_je_tour[idx]['m_i'].append(int(z_pss[82:94]) / 1000)
+            paletten_je_tour[idx]['m_i'].append(int(z_pss[82:94]) / 1000)
 
 
-                if blkblo_blktre_blkk02[z_pss[25:32]][1] == 'Y': # wenn Kennz.Kommission/Klima=Y, da der Kühlstatus nur dann für uns relevant ist
-                    if int(z_pss[110:111]) != 2:  # wollen nur den originalen Eintrag, wenn dieser nicht 2 ist
-                        paletten_je_tour[idx]['t_i'].append(int(z_pss[110:111]))
-                else:  # alles andere wird als Trockenware behandelt
-                    paletten_je_tour[idx]['t_i'].append(0)
+            if blkblo_blktre_blkk02[z_pss[25:32]][1] == 'Y': # wenn Kennz.Kommission/Klima=Y, da der Kühlstatus nur dann für uns relevant ist
+                if int(z_pss[110:111]) != 2:  # wollen nur den originalen Eintrag, wenn dieser nicht 2 ist
+                    paletten_je_tour[idx]['t_i'].append(int(z_pss[110:111]))
+            else:  # alles andere wird als Trockenware behandelt
+                paletten_je_tour[idx]['t_i'].append(0)
 
 
-                paletten_je_tour[idx]['zeile'].append(zeilennr_pss)
+            paletten_je_tour[idx]['zeile'].append(zeilennr_pss)
 
-            zeilennr_pss += 1
-        idx += 1
+        zeilennr_pss += 1
+
 
 
 """
@@ -894,183 +893,184 @@ ______________________________________________________________________________
 """
 
 
-tour_idx = 0
-for z_tar in tar_vor:
-    if z_tar[14:16] == 'AR':  # ansonsten ist die Tour von uns nicht zu berücksichtigen
-        time_tour = time.time()
-
-        #erzeuge ein Dataframe mit allen relevanten Infos zu dieser Tour - Vorteil: erleichtert alle späteren Schritte
-        tabelle=pd.DataFrame({'i': np.arange(len(paletten_je_tour[tour_idx]['n_i'])),
-                              'n_i': paletten_je_tour[tour_idx]['n_i'],
-                              'h_i': paletten_je_tour[tour_idx]['h_i'],
-                              'm_i': paletten_je_tour[tour_idx]['m_i'],
-                              't_i': paletten_je_tour[tour_idx]['t_i'],
-                              'zeile': paletten_je_tour[tour_idx]['zeile']})
 
 
-        #tourenabhängige Werte
-        m_lad=tabelle['m_i'].sum() # Einheit kg
+for tour_idx in range(0,anzahl_touren):
+    time_tour = time.time()
 
-        #Untergrenze:
-        lsp_u = radstand_trailer*(1-m_kp_max/m_lad)+abst_kp_stw_trailer
-
-        #Obergrenze:    -> Annahme: mindestens 25% des aktuellen Gesamtgewichts auf HA der Zugmaschine
-        anteil_mKP_HA=1-sattelvorm_tractor/radstand_tractor #KP-Last zu ...% auf der HA der Zugmaschine:
-        lsp_o = min(m_t_max/m_lad*radstand_trailer+abst_kp_stw_trailer, abst_kp_stw_trailer+radstand_trailer/m_lad*(0.7025*(m_lad+m_trailer)-0.2975*m_tractor+1/anteil_mKP_HA*last_HA_durch_m_tractor))
-
-        #print(f'Untergrenze (in m ab Stirnwand): {lsp_u:.3f} \nObergrenze (in m ab Stirnwand): {lsp_o:.3f}')
-
-
-        anz_pal=max(tabelle['i'])+1 #da Tabelle nullbasiert
-        oben=max(anz_pal-33,0)
-
-        platzhalter_hpal=math.ceil(sum(tabelle['h_i'])/3)*3 # Hochpaletten versperren in oberer Ebene MINDESTENS so viele Plätze
+    #erzeuge ein Dataframe mit allen relevanten Infos zu dieser Tour - Vorteil: erleichtert alle späteren Schritte
+    tabelle=pd.DataFrame({'i': np.arange(len(paletten_je_tour[tour_idx]['n_i'])),
+                          'n_i': paletten_je_tour[tour_idx]['n_i'],
+                          'h_i': paletten_je_tour[tour_idx]['h_i'],
+                          'm_i': paletten_je_tour[tour_idx]['m_i'],
+                          't_i': paletten_je_tour[tour_idx]['t_i'],
+                          'zeile': paletten_je_tour[tour_idx]['zeile']})
 
 
-        # eine Tour ist problematisch bzw. so nicht zu verplanen, wenn
-        if anz_pal > 66:
-            warnungen[tour_idx].append('Mitnahme von mehr als 66 Europaletten nicht möglich')
+    #tourenabhängige Werte
+    m_lad=tabelle['m_i'].sum() # Einheit kg
 
-        elif anz_pal > vorgaben_spediteure.loc[tarnr_tarspd[tour_idx][1],'Palettenanzahl']: #Spediteursvorgaben zur maximalen Palettenanz. (entweder Doppelstock=66 oder nicht=33) überschritten?
-            warnungen[tour_idx].append('Zu viele Paletten für diesen Spediteur eingeplant!')
+    #Untergrenze:
+    lsp_u = radstand_trailer*(1-m_kp_max/m_lad)+abst_kp_stw_trailer
 
-        elif m_lad > vorgaben_spediteure.loc[tarnr_tarspd[tour_idx][1],'Nutzlast']: #Spediteursvorgaben zur maximalen Nutzlast überschritten?
-            warnungen[tour_idx].append(f'Max. zulässige Nutzlast des Spediteurs von {vorgaben_spediteure.loc[tarnr_tarspd[tour_idx][1],"Nutzlast"]} kg um {m_lad - vorgaben_spediteure.loc[tarnr_tarspd[tour_idx][1],"Nutzlast"]} überschritten!')
+    #Obergrenze:    -> Annahme: mindestens 25% des aktuellen Gesamtgewichts auf HA der Zugmaschine
+    anteil_mKP_HA=1-sattelvorm_tractor/radstand_tractor #KP-Last zu ...% auf der HA der Zugmaschine:
+    lsp_o = min(m_t_max/m_lad*radstand_trailer+abst_kp_stw_trailer, abst_kp_stw_trailer+radstand_trailer/m_lad*(0.7025*(m_lad+m_trailer)-0.2975*m_tractor+1/anteil_mKP_HA*last_HA_durch_m_tractor))
 
-        elif anz_pal+platzhalter_hpal > 66:
-            warnungen[tour_idx].append('Mitnahme aller Paletten nicht möglich - Reihen über Hochpaletten müssen frei bleiben')
+    #print(f'Untergrenze (in m ab Stirnwand): {lsp_u:.3f} \nObergrenze (in m ab Stirnwand): {lsp_o:.3f}')
 
+
+    anz_pal=max(tabelle['i'])+1 #da Tabelle nullbasiert
+    oben=max(anz_pal-33,0)
+
+    platzhalter_hpal=math.ceil(sum(tabelle['h_i'])/3)*3 # Hochpaletten versperren in oberer Ebene MINDESTENS so viele Plätze
+
+
+    # eine Tour ist problematisch bzw. so nicht zu verplanen, wenn
+    if anz_pal > 66:
+        warnungen[tour_idx].append('Mitnahme von mehr als 66 Europaletten nicht möglich')
+
+    elif anz_pal > vorgaben_spediteure.loc[tarnr_tarspd[tour_idx][1],'Palettenanzahl']: #Spediteursvorgaben zur maximalen Palettenanz. (entweder Doppelstock=66 oder nicht=33) überschritten?
+        warnungen[tour_idx].append('Zu viele Paletten für diesen Spediteur eingeplant!')
+
+    elif m_lad > vorgaben_spediteure.loc[tarnr_tarspd[tour_idx][1],'Nutzlast']: #Spediteursvorgaben zur maximalen Nutzlast überschritten?
+        warnungen[tour_idx].append(f'Max. zulässige Nutzlast des Spediteurs von {vorgaben_spediteure.loc[tarnr_tarspd[tour_idx][1],"Nutzlast"]} kg um {m_lad - vorgaben_spediteure.loc[tarnr_tarspd[tour_idx][1],"Nutzlast"]} überschritten!')
+
+    elif anz_pal+platzhalter_hpal > 66:
+        warnungen[tour_idx].append('Mitnahme aller Paletten nicht möglich - Reihen über Hochpaletten müssen frei bleiben')
+
+
+
+    """
+    ______________________________________________________________________________
+
+    Ende Vorarbeit
+    Beginn des tatsächlichen Verfahrens - nur, wenn keine Warnung erzeugt wurde
+    zunächst Multi-Startverfahren
+    ______________________________________________________________________________
+    """
+
+
+    if len(warnungen[tour_idx])==0:
+
+        varianten = {'A': {'by': ['n_i', 't_i', 'm_i'],
+                           'ascending': [False, True, False]},
+                     'B': {'by': ['n_i', 't_i', 'm_i'],
+                           'ascending': [False, True, True]},
+                     'C': {'by': ['n_i', 't_i', 'h_i'],
+                           'ascending': [False, True, False]},
+                     'D': {'by': ['n_i', 't_i', 'h_i'],
+                           'ascending': [False, True, True]},
+                     'E': {'by': ['n_i', 't_i'],
+                           'ascending': [False, True]},
+                     'F': {'by': ['n_i', 't_i'],
+                           'ascending': [False, True]},
+                     'G': {'by': ['n_i'],
+                           'ascending': [False]},
+                     'H': {'by': ['n_i'],
+                           'ascending': [False]}}
+        # zweimal zufällig mit t_i für hoffentlich gute HPal-Verteilung
+        # zweimal zufällig ohne t_i - das darf man ggf. vernachlässigen, falls man ansonsten nichts findet
+
+
+        lkwplan = pd.DataFrame({str(reihe_k): ['o' for o in range(6)] for reihe_k in range(1, 12)})
+        plaene = []
+
+        for var in varianten:
+            tabelle = tabelle.sample(frac=1)  # Zeilen zufällig mischen, um ihre Reihenfolge zu verändern
+            tabelle.sort_values(by=varianten[var]['by'], ascending=varianten[var]['ascending'], inplace=True)
+            tabelle.reset_index(inplace=True, drop=True)
+
+            for planoption in range(1, 4):  # 1 bis 4 ist hier für: plan_fuellen(...,option):
+
+                plaene.append([pd.DataFrame(lkwplan.copy(deep=True)), None])
+
+                zweioptionen = False
+                if anz_pal <= 33:
+                    plaene[-1][0].iloc[3:, :] = 'x'
+
+                    if anz_pal <= 30:  # bei weniger als 31 gibt es zwei Möglichkeiten für ganz freie Reihen
+                        plaene.append([pd.DataFrame(plaene[-1][0].copy(deep=True)), None])
+                        zweioptionen = True
+
+                        for frei in range(0, 11 - math.ceil(anz_pal / 3)):
+                            plaene[-1][0].iloc[3:, frei] = 'x'  # hier ist -1 dann der neu hinzugefügte
+
+                elif anz_pal <= 63:  # auch hier gibt es zwei Möglichkeiten für ganz freie Reihen
+                    plaene.append([pd.DataFrame(plaene[-1][0].copy(deep=True)), None])
+                    zweioptionen = True
+
+                    for frei in range(0, 11 - math.ceil(oben / 3)):
+                        plaene[-1][0].iloc[3:, frei] = 'x'  # hier ist -1 dann der neu hinzugefügte
+
+                # bei 64 oder mehr mache nichts, weil Restreihe an der Tür ist & alle anderen Reihen voll sind
+
+                # dann kann man beide Versionen füllen und falls HPal kommt, ganze Reihen sperren
+                # trotzdem weiter befüllen, aber Strafkosten vergeben, damit ideale Lösung (wenn es eine gibt) besser ist
+
+                plan_fuellen(tabelle, plaene[-1][0], anz_pal, oben, planoption)
+                plaene[-1][1] = plan_bewertung(tabelle, plaene[-1][0])
+
+                if zweioptionen:
+                    plan_fuellen(tabelle, plaene[-2][0], anz_pal, oben, planoption)
+                    plaene[-2][1] = plan_bewertung(tabelle, plaene[-2][0])
+
+
+        # Duplikate entfernen
+        pl1 = 0
+        while pl1 < len(plaene):
+            pl2 = pl1 + 1
+            while pl2 < len(plaene):
+                if (plaene[pl1][0] == plaene[pl2][0]).all().all():
+                    plaene.pop(pl2)
+                else:
+                    pl2 += 1
+            pl1 += 1
+
+        # Pläne nach Potential aufteilen
+        plaene_zweitewahl = []
+        plaene_pal_ueber = []
+        pl = 0
+        while pl < len(plaene):
+            if plaene[pl][1][0] > 0:
+                plaene_pal_ueber.append(plaene.pop(pl))
+            elif sum(plaene[pl][1][0:6]) > 0.001:
+                plaene_zweitewahl.append(plaene.pop(pl))
+            else:
+                pl += 1
+
+        # Listen sortieren
+        plaene = plaene_erstewahl_sort(plaene)
+        plaene_zweitewahl = plaene_zweitewahl_sort(plaene_zweitewahl)
+        plaene_pal_ueber = plaene_pal_ueber_sort(plaene_pal_ueber)
 
 
         """
         ______________________________________________________________________________
     
-        Ende Vorarbeit
-        Beginn des tatsächlichen Verfahrens - nur, wenn keine Warnung erzeugt wurde
-        zunächst Multi-Startverfahren
+        Erzeugte Startlösungen sortiert
+        Beginn des Verbesserungsverfahrens, Auswahl der finalen Lösung
         ______________________________________________________________________________
         """
 
-        if len(warnungen[tour_idx])==0:
+        plaene = plaene_erstewahl_optimieren(tabelle, plaene)
 
-            varianten = {'A': {'by': ['n_i', 't_i', 'm_i'],
-                               'ascending': [False, True, False]},
-                         'B': {'by': ['n_i', 't_i', 'm_i'],
-                               'ascending': [False, True, True]},
-                         'C': {'by': ['n_i', 't_i', 'h_i'],
-                               'ascending': [False, True, False]},
-                         'D': {'by': ['n_i', 't_i', 'h_i'],
-                               'ascending': [False, True, True]},
-                         'E': {'by': ['n_i', 't_i'],
-                               'ascending': [False, True]},
-                         'F': {'by': ['n_i', 't_i'],
-                               'ascending': [False, True]},
-                         'G': {'by': ['n_i'],
-                               'ascending': [False]},
-                         'H': {'by': ['n_i'],
-                               'ascending': [False]}}
-            # zweimal zufällig mit t_i für hoffentlich gute HPal-Verteilung
-            # zweimal zufällig ohne t_i - das darf man ggf. vernachlässigen, falls man ansonsten nichts findet
+        plan_final, plan_final_bew = planauswahl_final(tabelle, plaene, plaene_zweitewahl, plaene_pal_ueber,
+                                                       diff_optimal_ab, max_zufaell_tausche)
 
 
-            lkwplan = pd.DataFrame({str(reihe_k): ['o' for o in range(6)] for reihe_k in range(1, 12)})
-            plaene = []
+        if sum(plan_final_bew[0:6]) <= 0.001 and plan_final_bew[-1] <= diff_optimal_ab:
+            fazit[tour_idx]=f'Optimale Lösung gefunden, Gewichtsdifferenz beträgt {plan_final_bew[-1]: .2f} %  -  entspricht ca. {plan_final_bew[-1] / 100 * sum(tabelle["m_i"]): .2f} kg Mehrgewicht auf einer Seite'
 
-            for var in varianten:
-                tabelle = tabelle.sample(frac=1)  # Zeilen zufällig mischen, um ihre Reihenfolge zu verändern
-                tabelle.sort_values(by=varianten[var]['by'], ascending=varianten[var]['ascending'], inplace=True)
-                tabelle.reset_index(inplace=True, drop=True)
+        elif sum(plan_final_bew[0:6]) <= 0.001 and plan_final_bew[-1] <= diff_zulaessig_ab:
+            fazit[tour_idx]=f'Zulässige Lösung gefunden, Gewichtsdifferenz beträgt {plan_final_bew[-1]: .2f} %  -  entspricht ca.{plan_final_bew[-1] / 100 * sum(tabelle["m_i"]): .2f} kg Mehrgewicht auf einer Seite'
 
-                for planoption in range(1, 4):  # 1 bis 4 ist hier für: plan_fuellen(...,option):
-
-                    plaene.append([pd.DataFrame(lkwplan.copy(deep=True)), None])
-
-                    zweioptionen = False
-                    if anz_pal <= 33:
-                        plaene[-1][0].iloc[3:, :] = 'x'
-
-                        if anz_pal <= 30:  # bei weniger als 31 gibt es zwei Möglichkeiten für ganz freie Reihen
-                            plaene.append([pd.DataFrame(plaene[-1][0].copy(deep=True)), None])
-                            zweioptionen = True
-
-                            for frei in range(0, 11 - math.ceil(anz_pal / 3)):
-                                plaene[-1][0].iloc[3:, frei] = 'x'  # hier ist -1 dann der neu hinzugefügte
-
-                    elif anz_pal <= 63:  # auch hier gibt es zwei Möglichkeiten für ganz freie Reihen
-                        plaene.append([pd.DataFrame(plaene[-1][0].copy(deep=True)), None])
-                        zweioptionen = True
-
-                        for frei in range(0, 11 - math.ceil(oben / 3)):
-                            plaene[-1][0].iloc[3:, frei] = 'x'  # hier ist -1 dann der neu hinzugefügte
-
-                    # bei 64 oder mehr mache nichts, weil Restreihe an der Tür ist & alle anderen Reihen voll sind
-
-                    # dann kann man beide Versionen füllen und falls HPal kommt, ganze Reihen sperren
-                    # trotzdem weiter befüllen, aber Strafkosten vergeben, damit ideale Lösung (wenn es eine gibt) besser ist
-
-                    plan_fuellen(tabelle, plaene[-1][0], anz_pal, oben, planoption)
-                    plaene[-1][1] = plan_bewertung(tabelle, plaene[-1][0])
-
-                    if zweioptionen:
-                        plan_fuellen(tabelle, plaene[-2][0], anz_pal, oben, planoption)
-                        plaene[-2][1] = plan_bewertung(tabelle, plaene[-2][0])
+        else:
+            fazit[tour_idx]=f'Keine zulässige Lösung gefunden. Die beste bisherige Lösung hat folgende Bewertung: {plan_final_bew}'
 
 
-            # Duplikate entfernen
-            pl1 = 0
-            while pl1 < len(plaene):
-                pl2 = pl1 + 1
-                while pl2 < len(plaene):
-                    if (plaene[pl1][0] == plaene[pl2][0]).all().all():
-                        plaene.pop(pl2)
-                    else:
-                        pl2 += 1
-                pl1 += 1
+    print(f'Verfahrensdauer Tour {tour_idx}: {time.time() - time_tour}')
 
-            # Pläne nach Potential aufteilen
-            plaene_zweitewahl = []
-            plaene_pal_ueber = []
-            pl = 0
-            while pl < len(plaene):
-                if plaene[pl][1][0] > 0:
-                    plaene_pal_ueber.append(plaene.pop(pl))
-                elif sum(plaene[pl][1][0:6]) > 0.001:
-                    plaene_zweitewahl.append(plaene.pop(pl))
-                else:
-                    pl += 1
-
-            # Listen sortieren
-            plaene = plaene_erstewahl_sort(plaene)
-            plaene_zweitewahl = plaene_zweitewahl_sort(plaene_zweitewahl)
-            plaene_pal_ueber = plaene_pal_ueber_sort(plaene_pal_ueber)
-
-
-            """
-            ______________________________________________________________________________
-        
-            Erzeugte Startlösungen sortiert
-            Beginn des Verbesserungsverfahrens, Auswahl der finalen Lösung
-            ______________________________________________________________________________
-            """
-
-            plaene = plaene_erstewahl_optimieren(tabelle, plaene)
-
-            plan_final, plan_final_bew = planauswahl_final(tabelle, plaene, plaene_zweitewahl, plaene_pal_ueber,
-                                                           diff_optimal_ab, max_zufaell_tausche)
-
-
-            if sum(plan_final_bew[0:6]) <= 0.001 and plan_final_bew[-1] <= diff_optimal_ab:
-                fazit[tour_idx]=f'Optimale Lösung gefunden, Gewichtsdifferenz beträgt {plan_final_bew[-1]: .2f} %  -  entspricht ca. {plan_final_bew[-1] / 100 * sum(tabelle["m_i"]): .2f} kg Mehrgewicht auf einer Seite'
-
-            elif sum(plan_final_bew[0:6]) <= 0.001 and plan_final_bew[-1] <= diff_zulaessig_ab:
-                fazit[tour_idx]=f'Zulässige Lösung gefunden, Gewichtsdifferenz beträgt {plan_final_bew[-1]: .2f} %  -  entspricht ca.{plan_final_bew[-1] / 100 * sum(tabelle["m_i"]): .2f} kg Mehrgewicht auf einer Seite'
-
-            else:
-                fazit[tour_idx]=f'Keine zulässige Lösung gefunden. Die beste bisherige Lösung hat folgende Bewertung: {plan_final_bew}'
-
-
-        print(f'Verfahrensdauer Tour {tour_idx}: {time.time() - time_tour}')
-        tour_idx+=1
 
 
 """
@@ -1082,20 +1082,18 @@ ______________________________________________________________________________
 """
 
 
-tour_idx = 0
-for z_tar in tar_vor:
-    if z_tar[14:16] == 'AR':  # ansonsten ist die Tour von uns nicht zu berücksichtigen
+for tour_idx in range(0,anzahl_touren):
 
-        if len(warnungen[tour_idx])>0:
-            print(f'Es gab bereits in der Vorüberprüfung folgendes Problem mit Tour {tarnr_tarspd[tour_idx][0]}:')
-            for w in warnungen[tour_idx]: #dürfte eigentlich nur ein Eintrag sein, sicherheitshalber iterieren
-                print('\t',w)
+    if len(warnungen[tour_idx])>0:
+        print(f'Es gab bereits in der Vorüberprüfung folgendes Problem mit Tour {tarnr_tarspd[tour_idx][0]}:')
+        for w in warnungen[tour_idx]: #dürfte eigentlich nur ein Eintrag sein, sicherheitshalber iterieren
+            print('\t',w)
 
-        else:
-            print(f'Verfahren für Tour {tarnr_tarspd[tour_idx][0]} durchlaufen. Ergebnis:')
-            print(fazit[tour_idx])
+    else:
+        print(f'Verfahren für Tour {tarnr_tarspd[tour_idx][0]} durchlaufen. Ergebnis:')
+        print(fazit[tour_idx])
 
-        tour_idx += 1
-        print('\n')
+    print('\n')
+
 
 print(f'Benötigte Gesamtzeit: {time.time()-starttime}')
