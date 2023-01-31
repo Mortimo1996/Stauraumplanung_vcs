@@ -45,3 +45,23 @@ regeln_tour = {}
 for i in list2:
     regeln_tour[i] = {'Nutzlast': df.loc[i]['Zulaessige Nutzlast'], 'Gesamtkapazitaet': df.loc[i]['Gesamtkapazitaet']}
 print(regeln_tour)
+
+
+
+
+
+#-----------------------------------------------------------------------------------
+#Notizen Lara
+
+vorgaben_spediteure = pd.read_csv('/Users/maartenvandenboom/IT-Studienprojekt/Fahrzeugdefinitionen.csv', delimiter=';')
+vorgaben_spediteure.set_index("Spediteur", inplace = True)
+
+"""#Spediteure der Touren in Liste speichern
+spediteure = []
+for z in tar_vor:
+    spediteure.append(z[53:63])
+#um anschließend die Einträge mit Andere zu überschreiben, zu denen wir keine Vorgaben haben
+for i in range(0,len(spediteure)):
+    #wenn i nicht im Dataframe vorgaben_spediteure vorkommt, setze i auf Andere
+    if (vorgaben_spediteure.loc[:,'Spediteur'] == spediteure[i]).any()==False:
+        spediteure[i]='Andere'"""
