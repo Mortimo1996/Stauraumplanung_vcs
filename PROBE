@@ -1213,50 +1213,71 @@ print(f'bisherige Dauer:{time.time() - starttime: .3f} s')
 
 
 # für alle zusammen:
-# gesamtzeilenliste=np.arange(len(pss_vor))
-#
+gesamtzeilenliste=np.arange(len(pss_vor))
+
 # -> für jede Tour einzeln
-#
-for x in pss_vor:
-    print(x[123:133])
+tour_idx=0
+ladenr=0
 
 tabelle.set_index('i', inplace=True)
 #print(tabelle)
 #print(pss_vor)
-for row in range(0,6):
-    for col in range(0,11):
+for col in range(0,11):
+    for row in [1,0,2,4,3,5]:
         wert=plan_final.iloc[row,col]
         if type(wert) != str:
+            ladenr+=1
             psszeile=tabelle.loc[wert,'zeile']
+            gesamtzeilenliste.remove(psszeile)
+
+            # TOURNR
+            pss_vor[psszeile] = pss_vor[psszeile][:94] + "00" + str(tarnr_tarspd[tour_idx][0]) + pss_vor[psszeile][101:]
+
             #BELADUNGSEBENE
             if row < 3:
                 pss_vor[psszeile]=pss_vor[psszeile][:101]+" 1"+pss_vor[psszeile][103:]
                 #zeilen[0] = zeilen[0][:4] + 'abc' + zeilen[0][7:]
             else:
                 pss_vor[psszeile]=pss_vor[psszeile][:101]+" 2"+pss_vor[psszeile][103:]
+
             # X-KOORDINATE
             if col < 10:
                 pss_vor[psszeile] = pss_vor[psszeile][:103]+"  "+str(col+1)+ pss_vor[psszeile][106:]
             else:
                 pss_vor[psszeile] = pss_vor[psszeile][:103] + " " + str(col + 1) + pss_vor[psszeile][106:]
-            # Y-KOORDINATE - FUNKTIONIERT NOCH NICHT!!
-            if row == 0 or 3:
-                pss_vor[psszeile] = pss_vor[psszeile][:106] + "  NNNN1" + pss_vor[psszeile][109:]
-            elif row == 1 or 4:
+
+            # Y-KOORDINATE
+            if row == 0 or row == 3:
+                pss_vor[psszeile] = pss_vor[psszeile][:106] + "  3" + pss_vor[psszeile][109:]
+            elif row == 1 or row == 4:
                 pss_vor[psszeile] = pss_vor[psszeile][:106] + "  2" + pss_vor[psszeile][109:]
             else:
-                pss_vor[psszeile] = pss_vor[psszeile][:106] + "  2" + pss_vor[psszeile][109:]
-            # TOUR - WO BEKOMME ICH DEN ZUGRIFF?
-            #pss_vor[psszeile] = pss_vor[psszeile][:94] + " " + str(col + 1) + pss_vor[psszeile][101:]
-            # DOCK - FUNKTIONIERT AUCH NOCH NICHT GANZ
-            #if pss_vor[psszeile][94:101] != " DOCK A   ":
-             #   pss_vor[psszeile] = pss_vor[psszeile][:94] + "kein Platz" + pss_vor[psszeile][101:]
+                pss_vor[psszeile] = pss_vor[psszeile][:106] + "  1" + pss_vor[psszeile][109:]
+
+            # LADEREIHENFOLGE
+            if ladenr<10:
+                pss_vor[psszeile] = pss_vor[psszeile][:115] + "   " + str(ladenr) + pss_vor[psszeile][119:]
+            else:
+                pss_vor[psszeile] = pss_vor[psszeile][:115] + "  " + str(ladenr) + pss_vor[psszeile][119:]
+
+            # DOCK
+            pss_vor[psszeile] = pss_vor[psszeile][:123] + " DOCK A   " + pss_vor[psszeile][133:]
+
+
+for restz in gesamtzeilenliste:
+    pss_vor[restz] = pss_vor[restz][:123] + "kein Platz" + pss_vor[restz][133:]
+
+
+new=open(pss_pfad,'w')
+# new.writelines(pss_vor)
+# new.close()
 
 
 
-print("_________________")
-for x in pss_vor:
-    print(x[94:101])
+
+#print("_________________")
+#for x in pss_vor:
+#    print(x[94:101])
 
 #print(plan_final)
 #print(pss_vor)

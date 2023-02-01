@@ -65,8 +65,8 @@ pss_vor = pss.readlines()
 pss.close()
 
 
-"""vorgaben_spediteure = pd.read_csv('/Users/maartenvandenboom/IT-Studienprojekt/Fahrzeugdefinitionen.csv', delimiter=';')
-vorgaben_spediteure.set_index('Spediteur',inplace=True,drop=False)"""
+vorgaben_spediteure = pd.read_csv('C:/Users/laras/Downloads/Fahrzeugdefinitionen.csv', delimiter=';')
+vorgaben_spediteure.set_index('Spediteur',inplace=True,drop=False)
 
 
 blkblo_blktre_blkk02={}
@@ -86,13 +86,14 @@ for z_tar in tar_vor:
         warnungen[idx]=[]
         fazit[idx] = ' '
 
-        """if (vorgaben_spediteure.loc[:, 'Spediteur'] == z_tar[53:63]).any(): # wenn es den Spediteur aus tar in unseren Spediteursvorgaben gibt
+        if (vorgaben_spediteure.loc[:, 'Spediteur'] == z_tar[53:63].strip()).any(): # wenn es den Spediteur aus tar in unseren Spediteursvorgaben gibt
             # starte Index von TARNR erst bei 18 statt 16, da Nr. in blk nur fünfstellig
-            tarnr_tarspd[idx] = [z_tar[18:23], z_tar[53:63]] #erzeugt dict {idx: [Tournr., Spediteur]}
+            tarnr_tarspd[idx] = [z_tar[18:23], z_tar[53:63].strip()] #erzeugt dict {idx: [Tournr., Spediteur]}
         else: # ansonsten wähle als Vorgaben hier den Defaultwert Andere
-            tarnr_tarspd[idx] = [z_tar[18:23], 'Andere']"""
+            tarnr_tarspd[idx] = [z_tar[18:23], 'Andere']
 
-        tarnr_tarspd[idx] = [z_tar[18:23], z_tar[53:63]]  # erzeugt dict {idx: [Tournr., Spediteur]}
+        #alt (für Variante ohne csv Datei):
+        #tarnr_tarspd[idx] = [z_tar[18:23], z_tar[53:63]]  # erzeugt dict {idx: [Tournr., Spediteur]}
 
         blkblo_je_tour[idx]=[]
         for z_blk in blk_vor:
@@ -945,8 +946,16 @@ ______________________________________________________________________________
 
 
 
-for tour_idx in range(0,anzahl_touren):
+#for tour_idx in range(0,anzahl_touren):
+for tour_idx in range(0,1):
     time_tour = time.time()
+
+    if tarnr_tarspd[tour_idx][1] == 'Andere': # bei Spediteur "Andere" die Paletten beliebig durchnummerieren und unser Verfahren gar nicht durchlaufen
+        bar['value'] += 100 / anzahl_touren
+        percent.set(str((tour_idx + 1) / anzahl_touren * 100) + "%")
+        window.update_idletasks()
+        continue
+
 
     #erzeuge ein Dataframe mit allen relevanten Infos zu dieser Tour - Vorteil: erleichtert alle späteren Schritte
     tabelle=pd.DataFrame({'i': np.arange(len(paletten_je_tour[tour_idx]['n_i'])),
@@ -977,16 +986,13 @@ for tour_idx in range(0,anzahl_touren):
 
 
     # eine Tour ist problematisch bzw. so nicht zu verplanen, wenn
-    if anz_pal > 66:
-        warnungen[tour_idx].append('Mitnahme von mehr als 66 Europaletten nicht möglich')
-        """
-        elif anz_pal > vorgaben_spediteure.loc[tarnr_tarspd[tour_idx][1],'Palettenanzahl']: #Spediteursvorgaben zur maximalen Palettenanz. (entweder Doppelstock=66 oder nicht=33) überschritten?
-            warnungen[tour_idx].append('Zu viele Paletten für diesen Spediteur eingeplant!')
-    
-        elif m_lad > vorgaben_spediteure.loc[tarnr_tarspd[tour_idx][1],'Nutzlast']: #Spediteursvorgaben zur maximalen Nutzlast überschritten?
-            warnungen[tour_idx].append(f'Max. zulässige Nutzlast des Spediteurs von {vorgaben_spediteure.loc[tarnr_tarspd[tour_idx][1],"Nutzlast"]} kg um {m_lad - vorgaben_spediteure.loc[tarnr_tarspd[tour_idx][1],"Nutzlast"]} überschritten!')
-        """
-    elif anz_pal+platzhalter_hpal > 66:
+    if anz_pal > vorgaben_spediteure.loc[tarnr_tarspd[tour_idx][1],'Gesamtkapazitaet']: #Spediteursvorgaben zur maximalen Palettenanz. (entweder Doppelstock=66 oder nicht=33) überschritten?
+        warnungen[tour_idx].append('Zu viele Paletten für diesen Spediteur eingeplant!')
+
+    elif m_lad > vorgaben_spediteure.loc[tarnr_tarspd[tour_idx][1],'Zulaessige Nutzlast']: #Spediteursvorgaben zur maximalen Nutzlast überschritten?
+        warnungen[tour_idx].append(f'Max. zulässige Nutzlast des Spediteurs von {vorgaben_spediteure.loc[tarnr_tarspd[tour_idx][1],"Nutzlast"]} kg um {m_lad - vorgaben_spediteure.loc[tarnr_tarspd[tour_idx][1],"Nutzlast"]} überschritten!')
+
+    elif anz_pal+platzhalter_hpal > 66 and vorgaben_spediteure.loc[tarnr_tarspd[tour_idx][1],'Gesamtkapazitaet']==66:
         warnungen[tour_idx].append('Mitnahme aller Paletten nicht möglich - Reihen über Hochpaletten müssen frei bleiben')
 
 
@@ -1125,8 +1131,28 @@ for tour_idx in range(0,anzahl_touren):
 
     print(f'Verfahrensdauer Tour {tour_idx}: {time.time() - time_tour}')
 
-    bar['value'] += 100/anzahl_touren
-    percent.set(str((tour_idx+1)/anzahl_touren*100) + "%")
+
+
+    """tabelle.set_index('i', inplace=True)
+    print(tabelle)
+    for row in range(0, 6):
+        for col in range(0, 11):
+
+            wert = plan_final.iloc[row, col]
+
+            if type(wert)!=str:
+                psszeile = tabelle.loc[wert, 'zeile']
+                # BELADUNGSEBENE
+                if row < 3:
+                    pss_vor[psszeile] = pss_vor[psszeile][:101] + " 1" + pss_vor[psszeile][103:]
+                    # zeilen[0] = zeilen[0][:4] + 'abc' + zeilen[0][7:]
+                else:
+                    pss_vor[psszeile] = pss_vor[psszeile][:101] + " 2" + pss_vor[psszeile][103:]"""
+
+
+
+    bar['value'] += 100 / anzahl_touren
+    percent.set(str((tour_idx + 1) / anzahl_touren * 100) + "%")
     window.update_idletasks()
 
 
@@ -1149,6 +1175,9 @@ for tour_idx in range(0,anzahl_touren):
         print(f'Es gab bereits in der Vorüberprüfung folgendes Problem mit Tour {tarnr_tarspd[tour_idx][0]}:')
         for w in warnungen[tour_idx]: #dürfte eigentlich nur ein Eintrag sein, sicherheitshalber iterieren
             print('\t',w)
+
+    elif tarnr_tarspd[tour_idx][1]=='Andere':
+        print(f'Tour {tarnr_tarspd[tour_idx][0]} hat Spediteurkennzeichen "Andere" und erhält deshalb nur eine aufsteigende Durchnummerierung ')
 
     else:
         print(f'Verfahren für Tour {tarnr_tarspd[tour_idx][0]} durchlaufen. Ergebnis:')
