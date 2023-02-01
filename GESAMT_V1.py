@@ -3,8 +3,51 @@ import pandas as pd
 import math
 import time
 from random import randint
+from tkinter import *
+from tkinter.ttk import *
+
 
 starttime = time.time()
+
+
+"""
+______________________________________________________________________________
+
+GUI erzeugen
+______________________________________________________________________________
+"""
+
+def quit():
+    window.destroy()
+
+window = Tk()
+window.title("Stauraumplanung")
+window.width = 500
+window.height = 50
+window.eval('tk::PlaceWindow . center')
+
+percent = StringVar()
+bar = Progressbar(window,orient=HORIZONTAL,length=400)
+bar.pack(pady=10)
+
+percentlabel = Label(window,textvariable=percent).pack()
+button2 = Button(window,text="Close",command=quit)
+button2.pack()
+
+bar['value'] = 0
+percent.set('0 %')
+window.update_idletasks()
+
+
+
+"""
+______________________________________________________________________________
+
+benötigte Daten aus asc-Dateien einlesen
+______________________________________________________________________________
+"""
+
+
 
 tar_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten November 2022/Daten vor Stauraumplanung/tar.asc'
 tar = open(tar_pfad, 'r')
@@ -22,8 +65,8 @@ pss_vor = pss.readlines()
 pss.close()
 
 
-vorgaben_spediteure = pd.read_csv('/Users/maartenvandenboom/IT-Studienprojekt/Fahrzeugdefinitionen.csv', delimiter=';')
-vorgaben_spediteure.set_index('Spediteur',inplace=True,drop=False)
+"""vorgaben_spediteure = pd.read_csv('/Users/maartenvandenboom/IT-Studienprojekt/Fahrzeugdefinitionen.csv', delimiter=';')
+vorgaben_spediteure.set_index('Spediteur',inplace=True,drop=False)"""
 
 
 blkblo_blktre_blkk02={}
@@ -43,11 +86,13 @@ for z_tar in tar_vor:
         warnungen[idx]=[]
         fazit[idx] = ' '
 
-        if (vorgaben_spediteure.loc[:, 'Spediteur'] == z_tar[53:63]).any(): # wenn es den Spediteur aus tar in unseren Spediteursvorgaben gibt
+        """if (vorgaben_spediteure.loc[:, 'Spediteur'] == z_tar[53:63]).any(): # wenn es den Spediteur aus tar in unseren Spediteursvorgaben gibt
             # starte Index von TARNR erst bei 18 statt 16, da Nr. in blk nur fünfstellig
             tarnr_tarspd[idx] = [z_tar[18:23], z_tar[53:63]] #erzeugt dict {idx: [Tournr., Spediteur]}
         else: # ansonsten wähle als Vorgaben hier den Defaultwert Andere
-            tarnr_tarspd[idx] = [z_tar[18:23], 'Andere']
+            tarnr_tarspd[idx] = [z_tar[18:23], 'Andere']"""
+
+        tarnr_tarspd[idx] = [z_tar[18:23], z_tar[53:63]]  # erzeugt dict {idx: [Tournr., Spediteur]}
 
         blkblo_je_tour[idx]=[]
         for z_blk in blk_vor:
@@ -100,7 +145,7 @@ ______________________________________________________________________________
 diff_optimal_ab=10 #Grenze, ab der eine Lösung optimal ist (z. B. 10, also 45 % <-> 55 % i.O.)
 diff_zulaessig_ab=50 #zulässig ab einer Verteilung von 75 % <-> 25 %
 
-max_zufaell_tausche=50 #für Funktion "planverb_zufaellig" - bricht aber eh ab, sobald alle NB erfüllt und diff_optimal_ab erreicht
+max_zufaell_tausche=7 #für Funktion "planverb_zufaellig" - bricht vorher ab, falls alle NB erfüllt und diff_optimal_ab erreicht
 
 
 #generelle Annahmen zum LKW:
@@ -292,8 +337,7 @@ def gewichte_bestimmen(tabelle_gb, lkwplan_gb):  # wird von Funktion "plan_bewer
 def plan_bewertung(tabelle_, lkwplan_):
     bewertung = [0 for i in range(7)]  # erzeugt Liste mit 7 Nullen, 0 bedeutet "alles gut"
 
-    # ---kein idx, da im Startverf.: Restreihe ist "an der Tür"
-    # ---kein idx, da in Verbesserung: Restreihe_einzeln am Rand, zwei mittig&Rand
+    # ---kein idx, da im Startverf.: Restreihe ist "an der Tür"; außerdem Restreihe_einzeln am Rand, zwei mittig&Rand
     # ---kein idx, da im Startverf.: oben stehen genau Q Paletten
     # ---kein idx, da Start&Verbesserung berücksichtigen: Auslieferungsreihenfolge
 
@@ -521,7 +565,7 @@ def gewichte_optimieren(tabelle_, lkwplan_, bewertung_):
     opt_gewicht = bewertung_[-1]
     plan_gewichte = gewichtsplan(tabelle_, lkwplan_)
 
-    z_sum = plan_gewichte.sum(axis=1)
+    z_sum = plan_gewichte.sum(axis=1,numeric_only=True)
     if z_sum[0] + z_sum[3] > z_sum[2] + z_sum[5]:  # if rechts>links
         w = 1
     else:
@@ -615,7 +659,7 @@ def gewichte_optimieren(tabelle_, lkwplan_, bewertung_):
     # aus Meeting mit Herrn Fünfer (13.01.2023):
     # Die schwerere Seite sollte bevorzugt links (=Zeilen 2+5) sein.
     # Grund: Wenn der LKW rechts von der Straße abkommt, kann der Fahrer es so leichter korrigieren.
-    z_sum_new = lkwplan_.sum(axis=1)
+    z_sum_new = lkwplan_.sum(axis=1,numeric_only=True)
     if (z_sum_new[0] + z_sum_new[3]) > (z_sum_new[2] + z_sum_new[5]):  # if rechts>links
         speicher_u_r = pd.DataFrame(lkwplan_.iloc[0, :].copy(deep=True))  # unten: rechte Seite zwischenspeichern
         speicher_o_r = pd.DataFrame(lkwplan_.iloc[3, :].copy(deep=True))  # oben: rechte Seite zwischenspeichern
@@ -834,10 +878,11 @@ def planverb_zufaellig(tabelle_, lkwplan_, lkwplan_bew, max_tausche):
 
 
 def planauswahl_final(tabelle, planliste, planliste_v2, planliste_v3, diff_optimal_ab, max_tausche):
-    bester_plan = pd.DataFrame(planliste[0][0].copy(deep=True))
-    bester_plan_bew = planliste[0][1]
 
     if len(planliste) > 0:
+        bester_plan = pd.DataFrame(planliste[0][0].copy(deep=True))
+        bester_plan_bew = planliste[0][1]
+
         if sum(bester_plan_bew[0:6]) <= 0.001 and bester_plan_bew[-1] <= diff_optimal_ab:
             return bester_plan, bester_plan_bew
 
@@ -867,10 +912,14 @@ def planauswahl_final(tabelle, planliste, planliste_v2, planliste_v3, diff_optim
                     bester_plan_bew = pl[1]
 
     if len(planliste_v2) > 0:
+        if len(planliste) == 0:
+            bester_plan = pd.DataFrame(planliste_v2[0][0].copy(deep=True))
+            bester_plan_bew = planliste_v2[0][1]
+
         bester_pl_v2, bester_pl_v2_bew = planauswahl_final(tabelle, planliste_v2, planliste_v3, [], diff_optimal_ab,
                                                            max_tausche)
 
-        if sum(bester_pl_v2[0:6]) <= 0.001 and bester_pl_v2_bew[-1] <= diff_optimal_ab:
+        if sum(bester_pl_v2_bew[0:6]) <= 0.001 and bester_pl_v2_bew[-1] <= diff_optimal_ab:
             return bester_pl_v2, bester_pl_v2_bew
 
         elif sum(bester_pl_v2_bew[:6]) < sum(bester_plan_bew[:6]) or (
@@ -879,7 +928,8 @@ def planauswahl_final(tabelle, planliste, planliste_v2, planliste_v3, diff_optim
             bester_plan = pd.DataFrame(bester_pl_v2.copy(deep=True))
             bester_plan_bew = bester_pl_v2_bew
 
-    return bester_plan, bester_plan_bew
+    if len(planliste) > 0 or len(planliste_v2) > 0:
+        return bester_plan, bester_plan_bew
 
 
 
@@ -929,13 +979,13 @@ for tour_idx in range(0,anzahl_touren):
     # eine Tour ist problematisch bzw. so nicht zu verplanen, wenn
     if anz_pal > 66:
         warnungen[tour_idx].append('Mitnahme von mehr als 66 Europaletten nicht möglich')
-
-    elif anz_pal > vorgaben_spediteure.loc[tarnr_tarspd[tour_idx][1],'Palettenanzahl']: #Spediteursvorgaben zur maximalen Palettenanz. (entweder Doppelstock=66 oder nicht=33) überschritten?
-        warnungen[tour_idx].append('Zu viele Paletten für diesen Spediteur eingeplant!')
-
-    elif m_lad > vorgaben_spediteure.loc[tarnr_tarspd[tour_idx][1],'Nutzlast']: #Spediteursvorgaben zur maximalen Nutzlast überschritten?
-        warnungen[tour_idx].append(f'Max. zulässige Nutzlast des Spediteurs von {vorgaben_spediteure.loc[tarnr_tarspd[tour_idx][1],"Nutzlast"]} kg um {m_lad - vorgaben_spediteure.loc[tarnr_tarspd[tour_idx][1],"Nutzlast"]} überschritten!')
-
+        """
+        elif anz_pal > vorgaben_spediteure.loc[tarnr_tarspd[tour_idx][1],'Palettenanzahl']: #Spediteursvorgaben zur maximalen Palettenanz. (entweder Doppelstock=66 oder nicht=33) überschritten?
+            warnungen[tour_idx].append('Zu viele Paletten für diesen Spediteur eingeplant!')
+    
+        elif m_lad > vorgaben_spediteure.loc[tarnr_tarspd[tour_idx][1],'Nutzlast']: #Spediteursvorgaben zur maximalen Nutzlast überschritten?
+            warnungen[tour_idx].append(f'Max. zulässige Nutzlast des Spediteurs von {vorgaben_spediteure.loc[tarnr_tarspd[tour_idx][1],"Nutzlast"]} kg um {m_lad - vorgaben_spediteure.loc[tarnr_tarspd[tour_idx][1],"Nutzlast"]} überschritten!')
+        """
     elif anz_pal+platzhalter_hpal > 66:
         warnungen[tour_idx].append('Mitnahme aller Paletten nicht möglich - Reihen über Hochpaletten müssen frei bleiben')
 
@@ -1055,8 +1105,12 @@ for tour_idx in range(0,anzahl_touren):
 
         plaene = plaene_erstewahl_optimieren(tabelle, plaene)
 
-        plan_final, plan_final_bew = planauswahl_final(tabelle, plaene, plaene_zweitewahl, plaene_pal_ueber,
-                                                       diff_optimal_ab, max_zufaell_tausche)
+        if len(plaene)>0 or len(plaene_zweitewahl)>0:
+            plan_final, plan_final_bew = planauswahl_final(tabelle, plaene, plaene_zweitewahl, plaene_pal_ueber,
+                                                           diff_optimal_ab, max_zufaell_tausche)
+        else:
+            plan_final, plan_final_bew = planauswahl_final(tabelle, plaene_pal_ueber, [], [],
+                                                           diff_optimal_ab, max_zufaell_tausche)
 
 
         if sum(plan_final_bew[0:6]) <= 0.001 and plan_final_bew[-1] <= diff_optimal_ab:
@@ -1071,6 +1125,13 @@ for tour_idx in range(0,anzahl_touren):
 
     print(f'Verfahrensdauer Tour {tour_idx}: {time.time() - time_tour}')
 
+    bar['value'] += 100/anzahl_touren
+    percent.set(str((tour_idx+1)/anzahl_touren*100) + "%")
+    window.update_idletasks()
+
+
+window.mainloop()
+
 
 
 """
@@ -1081,7 +1142,7 @@ Feedback an den Benutzer ausgeben (-> GUI)
 ______________________________________________________________________________
 """
 
-
+print('\n')
 for tour_idx in range(0,anzahl_touren):
 
     if len(warnungen[tour_idx])>0:
@@ -1093,7 +1154,6 @@ for tour_idx in range(0,anzahl_touren):
         print(f'Verfahren für Tour {tarnr_tarspd[tour_idx][0]} durchlaufen. Ergebnis:')
         print(fazit[tour_idx])
 
-    print('\n')
-
+    print(' ')
 
 print(f'Benötigte Gesamtzeit: {time.time()-starttime}')
