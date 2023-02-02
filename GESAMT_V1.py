@@ -35,7 +35,7 @@ button2 = Button(window,text="Close",command=quit)
 button2.pack()
 
 bar['value'] = 0
-percent.set('0 %')
+#percent.set('0 %')
 window.update_idletasks()
 
 
@@ -80,6 +80,7 @@ tarnr_tarspd = {}
 blkblo_je_tour={}
 warnungen={}
 fazit={}
+zeilennr_tar = 0
 idx = 0
 for z_tar in tar_vor:
     if z_tar[14:16] == 'AR': # ansonsten ist die Tour von uns nicht zu berücksichtigen
@@ -88,9 +89,9 @@ for z_tar in tar_vor:
 
         if (vorgaben_spediteure.loc[:, 'Spediteur'] == z_tar[53:63].strip()).any(): # wenn es den Spediteur aus tar in unseren Spediteursvorgaben gibt
             # starte Index von TARNR erst bei 18 statt 16, da Nr. in blk nur fünfstellig
-            tarnr_tarspd[idx] = [z_tar[18:23], z_tar[53:63].strip()] #erzeugt dict {idx: [Tournr., Spediteur]}
+            tarnr_tarspd[idx] = [z_tar[18:23], z_tar[53:63].strip(), zeilennr_tar] #erzeugt dict {idx: [Tournr., Spediteur, Zeile]}
         else: # ansonsten wähle als Vorgaben hier den Defaultwert Andere
-            tarnr_tarspd[idx] = [z_tar[18:23], 'Andere']
+            tarnr_tarspd[idx] = [z_tar[18:23], 'Andere', zeilennr_tar]
 
         #alt (für Variante ohne csv Datei):
         #tarnr_tarspd[idx] = [z_tar[18:23], z_tar[53:63]]  # erzeugt dict {idx: [Tournr., Spediteur]}
@@ -101,6 +102,7 @@ for z_tar in tar_vor:
                 blkblo_je_tour[idx].append(z_blk[16:23]) #erzeugt dict {idx: [Liste aller Blockauftragsnr.]}
 
         idx += 1
+    zeilennr_tar += 1
 anzahl_touren=idx
 
 
@@ -951,6 +953,9 @@ gesamtzeilenliste=list(np.arange(len(pss_vor)))
 for tour_idx in range(0,anzahl_touren):
     time_tour = time.time()
 
+    percent.set(f'Tour {tour_idx+1}/{anzahl_touren}')
+    window.update_idletasks()
+
 
     if tarnr_tarspd[tour_idx][1] == 'Andere': # bei Spediteur "Andere" die Paletten beliebig durchnummerieren und unser Verfahren gar nicht durchlaufen
         print(f'Tour {tour_idx} -> Spediteur: "Andere"')
@@ -1192,12 +1197,20 @@ for tour_idx in range(0,anzahl_touren):
                 # Dock
                 pss_vor[psszeile] = pss_vor[psszeile][:123] + " DOCK A   " + pss_vor[psszeile][133:]
 
+
+    tar_vor[tarnr_tarspd[tour_idx][2]] = tar_vor[tarnr_tarspd[tour_idx][2]][:97] + "001" + tar_vor[tarnr_tarspd[tour_idx][2]][100:]
+
+    """print('\n',plan_final)
+    if len(warnungen[tour_idx]) > 0:
+        print(warnungen[tour_idx][0])
+    print(plan_final_bew)"""
     print(f'Verfahrensdauer Tour {tour_idx}: {time.time() - time_tour}')
 
 
     bar['value'] += 100 / anzahl_touren
-    percent.set(str((tour_idx + 1) / anzahl_touren * 100) + "%")
+    #percent.set(str((tour_idx + 1) / anzahl_touren * 100) + "%")
     window.update_idletasks()
+
 
 
 print(f'\nÜber alle {anzahl_touren} Touren konnten insgesamt {len(gesamtzeilenliste)} von {len(pss_vor)} Paletten nicht passend eingeplant werden.')
@@ -1209,10 +1222,20 @@ for restz in gesamtzeilenliste:
 #pss-Datei überschreiben bzw. hier zu Testzwecken neue Datei erzeugen
 #pss_pfad
 pss_pfad_unsere_lsg='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten November 2022/Daten nach_eigene Lösung/pss.asc'
-new=open(pss_pfad_unsere_lsg,'w')
-new.writelines(pss_vor)
-new.close()
+new_pss=open(pss_pfad_unsere_lsg,'w')
+new_pss.writelines(pss_vor)
+new_pss.close()
 
+
+#tar-Datei überschreiben bzw. hier zu Testzwecken neue Datei erzeugen
+tar_pfad_unsere_lsg='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten November 2022/Daten nach_eigene Lösung/tar.asc'
+new_tar=open(tar_pfad_unsere_lsg,'w')
+new_tar.writelines(tar_vor)
+new_tar.close()
+
+
+percent.set("Verfahren abgeschlossen")
+window.update_idletasks()
 
 window.mainloop()
 
