@@ -47,30 +47,32 @@ benötigte Daten aus asc-Dateien einlesen
 ______________________________________________________________________________
 """
 
-tar_pfad='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten 2017/20171115_1nach/tar.asc'
+#tar_pfad='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten 2017/20171115_1nach/tar.asc'
 #tar_pfad='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten August 2022/Daten vor Stauraumplanung/tar.asc'
-#tar_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten November 2022/Daten vor Stauraumplanung/tar.asc'
+tar_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten November 2022/Daten vor Stauraumplanung/tar.asc'
 tar = open(tar_pfad, 'r')
 tar_vor = tar.readlines()
 tar.close()
 
-blk_pfad='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten 2017/20171115_1nach/blk.asc'
+#blk_pfad='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten 2017/20171115_1nach/blk.asc'
 #blk_pfad='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten August 2022/Daten vor Stauraumplanung/blk.asc'
-#blk_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten November 2022/Daten vor Stauraumplanung/blk.asc'
+blk_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten November 2022/Daten vor Stauraumplanung/blk.asc'
 blk = open(blk_pfad, 'r')
 blk_vor = blk.readlines()
 blk.close()
 
-pss_pfad='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten 2017/20171115_1nach/pss.asc'
+#pss_pfad='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten 2017/20171115_1nach/pss.asc'
 #pss_pfad='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten August 2022/Daten vor Stauraumplanung/pss.asc'
-#pss_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten November 2022/Daten vor Stauraumplanung/pss.asc'
+pss_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten November 2022/Daten vor Stauraumplanung/pss.asc'
 pss = open(pss_pfad, 'r')
 pss_vor = pss.readlines()
 pss.close()
 
-
 vorgaben_spediteure = pd.read_csv('C:/Users/laras/Downloads/Fahrzeugdefinitionen.csv', delimiter=';')
 vorgaben_spediteure.set_index('Spediteur',inplace=True,drop=False)
+
+laendervorgaben = pd.read_csv('C:/Users/laras/Downloads/Laendervorgaben.csv', delimiter=';')
+laendervorgaben.set_index('Laendercode',inplace=True,drop=False)
 
 
 blkblo_blktre_blkk02={}
@@ -100,10 +102,12 @@ for z_tar in tar_vor:
         #alt (für Variante ohne csv Datei):
         #tarnr_tarspd[idx] = [z_tar[18:23], z_tar[53:63]]  # erzeugt dict {idx: [Tournr., Spediteur]}
 
-        blkblo_je_tour[idx]=[]
+        #blkblo_je_tour[idx]=[]
+        blkblo_je_tour[idx] = {'Auftragsnr':[], 'Land':[]}
         for z_blk in blk_vor:
             if z_blk[426:431] == z_tar[18:23]:  # gleiche Tournr.
-                blkblo_je_tour[idx].append(z_blk[16:23]) #erzeugt dict {idx: [Liste aller Blockauftragsnr.]}
+                blkblo_je_tour[idx]['Auftragsnr'].append(z_blk[16:23])  # Liste aller Blockauftragsnummern dieser Tour
+                blkblo_je_tour[idx]['Land'].append(z_blk[165:167])  # Liste aller Zielländer dieser Tour
 
         idx += 1
     zeilennr_tar += 1
@@ -116,7 +120,7 @@ for idx in range(0,anzahl_touren): #nicht in vorherige for-Schleife integrierbar
     zeilennr_pss = 0
     for z_pss in pss_vor:
 
-        if z_pss[25:32] in blkblo_je_tour[idx]: # wenn BLKNR zur aktuell bearbeiteten Tour gehört
+        if z_pss[25:32] in blkblo_je_tour[idx]['Auftragsnr']: # wenn BLKNR zur aktuell bearbeiteten Tour gehört
             paletten_je_tour[idx]['n_i'].append(int(blkblo_blktre_blkk02[z_pss[25:32]][0]))
 
             if int(z_pss[45:55]) > 1070:
@@ -165,18 +169,10 @@ m_tractor=7943
 m_trailer=8590
 massenschw_vorHA_tractor=2.538
 massenschw_zuStw_trailer=6.609 #Abstand zur Stirnwand
-m_HA_max_ges=11500 #gesetzliche Vorgabe
-m_t_max_ges=24000 #gesetzliche Vorgabe
-
-
 
 last_kp_durch_m_trailer=(1-(massenschw_zuStw_trailer-abst_kp_stw_trailer)/radstand_trailer)*m_trailer
 last_t_durch_m_trailer=(massenschw_zuStw_trailer-abst_kp_stw_trailer)/radstand_trailer*m_trailer
 last_HA_durch_m_tractor=(1-massenschw_vorHA_tractor/radstand_tractor)*m_tractor
-m_kp_max_vor_m_trailer=(m_HA_max_ges-last_HA_durch_m_tractor)/(1-sattelvorm_tractor/radstand_tractor)
-
-m_kp_max=m_kp_max_vor_m_trailer-last_kp_durch_m_trailer
-m_t_max=m_t_max_ges-last_t_durch_m_trailer
 
 
 
@@ -304,6 +300,8 @@ def plan_fuellen(tabelle, lkwplan, anz_pal, oben, option):
                     oben -= 1
 
             row_opt.remove(row_opt[nr])
+
+    return lkwplan
 
 
 
@@ -554,15 +552,22 @@ def sort_3_a(e):
     return e[1][-1] #Gewichtsdifferenz
 
 def sort_3_b(e):
-    return e[1][0] #Anz. übriger Paletten
+    return sum(e[1][1:6])  # Summe der anderen Bewertungsindizes exkl. Gewichtsdifferenz
 
 def sort_3_c(e):
-    return sum(e[1][1:6]) #Summe der anderen Bewertungsindizes exkl. Gewichtsdifferenz
+    return e[1][0] #Anz. übriger Paletten
+
+def sort_3_d(e):
+    # idx1: HPal zulässiger Platz
+    # idx4: Ladebalkenbelastung eingehalten (nicht so schlimm wie die anderen beiden, da voraussichtlich besser optimierbar
+    # idx5: Achslastvorgaben eingehalten
+    return (0 if e[1][1]<1 else 5)+(0 if e[1][4]<1 else 2)+(0 if e[1][5]<1 else 5)
 
 def plaene_pal_ueber_sort(plaene_liste):
     plaene_liste.sort(key=sort_3_a)
     plaene_liste.sort(key=sort_3_b)
     plaene_liste.sort(key=sort_3_c)
+    plaene_liste.sort(key=sort_3_d)
     return plaene_liste
 
 
@@ -852,7 +857,10 @@ def planverb_zufaellig(tabelle_, lkwplan_, lkwplan_bew, max_tausche):
             lkwplan_v = gewichte_optimieren(tabelle_, lkwplan_v, plan_bewertung(tabelle_, lkwplan_v))
             lkwplan_v_bew = plan_bewertung(tabelle_, lkwplan_v)
 
-            if sum(lkwplan_v_bew[0:6]) <= 0.001 and lkwplan_v_bew[-1] <= diff_optimal_ab:
+            # if sum(lkwplan_v_bew[0:6]) <= 0.001 and lkwplan_v_bew[-1] <= diff_optimal_ab:
+                # return lkwplan_v, lkwplan_v_bew
+            if math.floor(lkwplan_v_bew[1]) + math.floor(lkwplan_v_bew[2]) + sum(lkwplan_v_bew[4:6]) <= 0.001 and lkwplan_v_bew[-1] <= diff_optimal_ab:
+                # eine bessere Lsg kann hier nicht erzeugt werden, weil Anz. fehlender Pal. & Pal.-Verteilung oben bisher konstant bleibt
                 return lkwplan_v, lkwplan_v_bew
 
                 # Abbruch der gesamten Funktion mit return lwkplan_v, wenn alle "Optimal"-Kriterien erfüllt sind
@@ -860,9 +868,10 @@ def planverb_zufaellig(tabelle_, lkwplan_, lkwplan_bew, max_tausche):
                 # und damit in den nächsten Durchlauf der while-Schleife gehen
 
             else:
-                # zunächst noch Ladebalken-Verbesserung durchführen (nur wenn das das einzige Problem ist)
-                if lkwplan_v_bew[4] != 0 and sum(lkwplan_v_bew[:3]) + lkwplan_v_bew[5] == 0 and lkwplan_v_bew[
-                    3] <= 0.001:
+                # zunächst noch Ladebalken-Verbesserung durchführen
+                # nur wenn die anderen beiden notwendigen Indizes 1 und 5 passend erfüllt sind
+                # if lkwplan_v_bew[4] != 0 and sum(lkwplan_v_bew[:3]) + lkwplan_v_bew[5] == 0 and lkwplan_v_bew[3] <= 0.001:
+                if lkwplan_v_bew[4] != 0 and math.floor(lkwplan_v_bew[1]) + lkwplan_v_bew[5] == 0:
                     lkwplan_v = ladebalken_ausgleich(tabelle_, lkwplan_v)
                     lkwplan_v_bew = plan_bewertung(tabelle_, lkwplan_v)
                     if lkwplan_v_bew[4] == 0:
@@ -870,8 +879,7 @@ def planverb_zufaellig(tabelle_, lkwplan_, lkwplan_bew, max_tausche):
 
                 # gucken ob neuer Plan besser ist als vorher: wenn ja dann damit weitermachen, sonst mit dem alten
 
-                if sum(lkwplan_v_bew[:6]) > sum(lkwplan_bew[:6]) or (
-                        sum(lkwplan_v_bew[0:6]) == sum(lkwplan_bew[0:6]) and lkwplan_v_bew[-1] >= lkwplan_bew[-1]):
+                if sum(lkwplan_v_bew[:6]) > sum(lkwplan_bew[:6]) or (sum(lkwplan_v_bew[0:6]) == sum(lkwplan_bew[0:6]) and lkwplan_v_bew[-1] >= lkwplan_bew[-1]):
                     # keine Verbesserung -> setze alten Plan als lkwplan_v und nutze ihn erneut für den nächsten Durchgang
                     lkwplan_v = pd.DataFrame(lkwplan_.copy(deep=True))
 
@@ -996,6 +1004,27 @@ for tour_idx in range(0,anzahl_touren):
                           't_i': paletten_je_tour[tour_idx]['t_i'],
                           'zeile': paletten_je_tour[tour_idx]['zeile']})
 
+    # Ländervorgaben - individuell je Tour prüfen, da Touren verschiedene Zielländer haben können
+    tour_laender = set(blkblo_je_tour[tour_idx]['Land']) # eine Menge (set) erhält jedes Element nur einmal
+
+    if len(tour_laender)==1:
+        m_HA_max_ges = laendervorgaben.loc[min(tour_laender),'Achslast Sattelzug Hinten']  # min gibt hier das eine Element der Menge zurück
+        m_t_max_ges = laendervorgaben.loc[min(tour_laender),'Auflieger Dreiachsig']
+    else:
+        m_HA_max_ges = laendervorgaben.loc[min(tour_laender), 'Achslast Sattelzug Hinten']  # min gibt hier ein Element der Menge zurück
+        m_t_max_ges = laendervorgaben.loc[min(tour_laender), 'Auflieger Dreiachsig']
+        for ld in tour_laender:
+            if ld != min(tour_laender):
+                m_HA_v2 = laendervorgaben.loc[ld, 'Achslast Sattelzug Hinten']
+                m_t_v2 = laendervorgaben.loc[ld, 'Auflieger Dreiachsig']
+                if m_HA_v2<m_HA_max_ges:
+                    m_HA_max_ges=m_HA_v2
+                if m_t_v2<m_t_max_ges:
+                    m_t_max_ges=m_t_v2
+
+    m_kp_max_vor_m_trailer = (m_HA_max_ges - last_HA_durch_m_tractor) / (1 - sattelvorm_tractor / radstand_tractor)
+    m_kp_max = m_kp_max_vor_m_trailer - last_kp_durch_m_trailer
+    m_t_max = m_t_max_ges - last_t_durch_m_trailer
 
     #tourenabhängige Werte
     m_lad=tabelle['m_i'].sum() # Einheit kg
@@ -1052,12 +1081,26 @@ for tour_idx in range(0,anzahl_touren):
                        'ascending': [False, True]},
                  'F': {'by': ['n_i', 't_i'],
                        'ascending': [False, True]},
-                 'G': {'by': ['n_i'],
+                 'G': {'by': ['n_i', 't_i'],
+                       'ascending': [False, True]},
+                 'H': {'by': ['n_i', 't_i'],
+                       'ascending': [False, True]},
+                 'I': {'by': ['n_i', 't_i'],
+                       'ascending': [False, True]},
+                 'J': {'by': ['n_i', 'h_i'],
+                       'ascending': [False, True]},
+                 'K': {'by': ['n_i', 'h_i'],
+                       'ascending': [False, False]},
+                 'L': {'by': ['n_i', 'm_i'],
+                       'ascending': [False, True]},
+                 'M': {'by': ['n_i', 'm_i'],
+                       'ascending': [False, False]},
+                 'N': {'by': ['n_i'],
                        'ascending': [False]},
-                 'H': {'by': ['n_i'],
+                 'O': {'by': ['n_i'],
+                       'ascending': [False]},
+                 'P': {'by': ['n_i'],
                        'ascending': [False]}}
-    # zweimal zufällig mit t_i für hoffentlich gute HPal-Verteilung
-    # zweimal zufällig ohne t_i - das darf man ggf. vernachlässigen, falls man ansonsten nichts findet
 
 
     lkwplan = pd.DataFrame({str(reihe_k): ['o' for o in range(6)] for reihe_k in range(1, 12)})
@@ -1081,7 +1124,7 @@ for tour_idx in range(0,anzahl_touren):
                     zweioptionen = True
 
                     for frei in range(0, 11 - math.ceil(anz_pal / 3)):
-                        plaene[-1][0].iloc[3:, frei] = 'x'  # hier ist -1 dann der neu hinzugefügte
+                        plaene[-1][0].iloc[:3, frei] = 'x'  # hier ist -1 dann der neu hinzugefügte
 
             elif anz_pal <= 63:  # auch hier gibt es zwei Möglichkeiten für ganz freie Reihen
                 plaene.append([pd.DataFrame(plaene[-1][0].copy(deep=True)), None])
@@ -1095,12 +1138,21 @@ for tour_idx in range(0,anzahl_touren):
             # dann kann man beide Versionen füllen und falls HPal kommt, ganze Reihen sperren
             # trotzdem weiter befüllen, aber Strafkosten vergeben, damit ideale Lösung (wenn es eine gibt) besser ist
 
-            plan_fuellen(tabelle, plaene[-1][0], anz_pal, oben, planoption)
+            plaene[-1][0] = plan_fuellen(tabelle, plaene[-1][0], anz_pal, oben, planoption)
             plaene[-1][1] = plan_bewertung(tabelle, plaene[-1][0])
 
             if zweioptionen:
-                plan_fuellen(tabelle, plaene[-2][0], anz_pal, oben, planoption)
+                plaene[-2][0] = plan_fuellen(tabelle, plaene[-2][0], anz_pal, oben, planoption)
                 plaene[-2][1] = plan_bewertung(tabelle, plaene[-2][0])
+                if (sum(plaene[-2][1][0:6]) <= 0.001 and plaene[-2][1][-1] <= diff_optimal_ab):
+                    # break bricht nur die innere "for var in varianten"-Schleife ab
+                    break
+
+            if (sum(plaene[-1][1][0:6]) <= 0.001 and plaene[-1][1][-1] <= diff_optimal_ab):
+                # Sortierung nach if zweioptionen gewählt, um beide Optionen noch mitzunehmen
+                # break bricht nur die innere "for var in varianten"-Schleife ab
+                break
+
 
 
     # Duplikate entfernen
@@ -1129,7 +1181,35 @@ for tour_idx in range(0,anzahl_touren):
     # Listen sortieren
     plaene = plaene_erstewahl_sort(plaene)
     plaene_zweitewahl = plaene_zweitewahl_sort(plaene_zweitewahl)
-    plaene_pal_ueber = plaene_pal_ueber_sort(plaene_pal_ueber)
+
+    waehle_else = True
+    if len(plaene)>0: # wenn es Lösungen gibt, die alle Paletten mitnehmen können, löschen wir die anderen direkt
+        plaene_pal_ueber=[]
+        waehle_else = False
+    elif len(plaene_zweitewahl)>0: # wird nur durchlaufen, wenn len(plaene)==0
+        for p in range(0,len(plaene_zweitewahl)):
+            if plaene_zweitewahl[p][1][1]+sum(plaene_zweitewahl[p][1][4:6])==0:
+                # prüfe, ob idx1+idx4+idx5==0 (später notwendige Bedingungen)
+                # man kann z. B. idx4 voraussichtlich gut optimieren, aber in dieser Code-Sortierung nicht mit Sicherheit gegeben
+                # wenn das für mind. einen Plan der 2. Wahl erfüllt ist, können wir plaene_pal_ueber löschen
+                # ansonsten könnte es sein, dass 2. Wahl die wirklich notwendigen Bed. niemals erfüllt & wir doch pal_ueber brauchen
+                plaene_pal_ueber = []
+                waehle_else = False
+                break
+
+    if len(plaene)+len(plaene_zweitewahl)==0 or waehle_else:
+        plaene_pal_ueber = plaene_pal_ueber_sort(plaene_pal_ueber)
+
+        # folgenden Zeilen ggf. nur sinnvoll, solange das Verbesserungsverfahren keine Hinzunahme weiterer Paletten ermöglicht
+        # plaene_pal_ueber ist nach Anz. fehlender Paletten, aber übergeordnet nochmal nach Bewertung idx1,idx4,idx5 sortiert
+        # mit der Sortierung erreiche ich, dass ich die Anz. fehlender Paletten einer akzeptablen Lsg. als Untergrenze setzen kann
+        plaene_ueber_neu = [plaene_pal_ueber[0]]
+        for p in range(1,len(plaene_pal_ueber)):
+            if plaene_pal_ueber[p][1][0] <= plaene_pal_ueber[0][1][0]: # wenn die Anzahl nicht mitnehmbarer Paletten der der akzeptablen Lsg. entspricht
+                plaene_ueber_neu.append(plaene_pal_ueber[p])
+            else:
+                break # kann die for-Schleife vorzeitig verlassen, weil plaene_pal_ueber nach Anz. fehlender Paletten sortiert ist
+        plaene_pal_ueber = plaene_ueber_neu.copy()
 
 
 
