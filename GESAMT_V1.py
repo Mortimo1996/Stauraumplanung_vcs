@@ -47,19 +47,23 @@ benötigte Daten aus asc-Dateien einlesen
 ______________________________________________________________________________
 """
 
-
-
-tar_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten November 2022/Daten vor Stauraumplanung/tar.asc'
+tar_pfad='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten 2017/20171115_1nach/tar.asc'
+#tar_pfad='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten August 2022/Daten vor Stauraumplanung/tar.asc'
+#tar_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten November 2022/Daten vor Stauraumplanung/tar.asc'
 tar = open(tar_pfad, 'r')
 tar_vor = tar.readlines()
 tar.close()
 
-blk_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten November 2022/Daten vor Stauraumplanung/blk.asc'
+blk_pfad='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten 2017/20171115_1nach/blk.asc'
+#blk_pfad='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten August 2022/Daten vor Stauraumplanung/blk.asc'
+#blk_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten November 2022/Daten vor Stauraumplanung/blk.asc'
 blk = open(blk_pfad, 'r')
 blk_vor = blk.readlines()
 blk.close()
 
-pss_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten November 2022/Daten vor Stauraumplanung/pss.asc'
+pss_pfad='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten 2017/20171115_1nach/pss.asc'
+#pss_pfad='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten August 2022/Daten vor Stauraumplanung/pss.asc'
+#pss_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten November 2022/Daten vor Stauraumplanung/pss.asc'
 pss = open(pss_pfad, 'r')
 pss_vor = pss.readlines()
 pss.close()
@@ -962,6 +966,7 @@ for tour_idx in range(0,anzahl_touren):
 
         ladenr = 0
         for z in paletten_je_tour[tour_idx]['zeile']:
+            gesamtzeilenliste.remove(z)
             ladenr+=1
 
             # Tournummer
