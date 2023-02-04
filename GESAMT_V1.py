@@ -783,26 +783,30 @@ def planverb_zufaellig(tabelle_, lkwplan_, lkwplan_bew, max_tausche):
     tabelle_2 = tabelle_.set_index('i', inplace=False, drop=False)  # erzeugt eine Kopie
 
     # alten Plan kopieren, um später auf Verbesserung überprüfen zu können
+    lkwplan_a = pd.DataFrame(lkwplan_.copy(deep=True))
+    lkwplan_a_bew = lkwplan_bew
     lkwplan_v = pd.DataFrame(lkwplan_.copy(deep=True))
 
     # neue Tabelle bzw. Beladungsplan mit Nr. Auslieferungsreihenfolge erstellen
-    lkwplan_n_werte = pd.DataFrame(lkwplan_.copy(deep=True))
+    lkwplan_n_werte_a = pd.DataFrame(lkwplan_.copy(deep=True))
 
-    for col in range(0, lkwplan_n_werte.shape[1]):
-        for row in range(0, lkwplan_n_werte.shape[0]):
-            if type(lkwplan_n_werte.iloc[row, col]) != str:
-                lkwplan_n_werte.iloc[row, col] = tabelle_2.loc[lkwplan_v.iloc[row, col], 'n_i']
+    # Plan mit n-Werten füllen
+    for col in range(0, lkwplan_n_werte_a.shape[1]):
+        for row in range(0, lkwplan_n_werte_a.shape[0]):
+            if type(lkwplan_n_werte_a.iloc[row, col]) != str:
+                lkwplan_n_werte_a.iloc[row, col] = tabelle_2.loc[lkwplan_a.iloc[row, col], 'n_i']
             else:
-                lkwplan_n_werte.iloc[row, col] = 'x'  # setze zur Vereinfachung auch mögliche 'o' auf 'x'
+                lkwplan_n_werte_a.iloc[row, col] = 'x'  # setze zur Vereinfachung auch mögliche 'o' auf 'x'
+
+    lkwplan_n_werte_v = pd.DataFrame(lkwplan_n_werte_a.copy(deep=True))
 
     tauschnr = 0
     while tauschnr < max_tausche:
         # zufällige Palette auswählen
-        pal_row_idx = randint(0, lkwplan_v.shape[
-            0] - 1)  # -1, da wir den Index nutzen und randint(0,2) von 0 bis einschl. 2 zieht
-        pal_col_idx = randint(0, lkwplan_v.shape[1] - 1)
+        pal_row_idx = randint(0, lkwplan_a.shape[0] - 1)  # -1, da wir den Index nutzen und randint(0,2) von 0 bis einschl. 2 zieht
+        pal_col_idx = randint(0, lkwplan_a.shape[1] - 1)
 
-        n_wert = lkwplan_n_werte.iloc[pal_row_idx, pal_col_idx]
+        n_wert = lkwplan_n_werte_a.iloc[pal_row_idx, pal_col_idx]
 
         if n_wert != 'x':
 
@@ -811,7 +815,7 @@ def planverb_zufaellig(tabelle_, lkwplan_, lkwplan_bew, max_tausche):
             # alle Elemente in gleicher Reihe gehen immer
             for row_n in range(0, 6):
                 if row_n != pal_row_idx:
-                    if lkwplan_n_werte.iloc[row_n, pal_col_idx] != 'x':
+                    if lkwplan_n_werte_a.iloc[row_n, pal_col_idx] != 'x':
                         tauschpartner.append([row_n, pal_col_idx])
 
                         # bei den anderen Reihen müssen h_wert und t_wert berücksichtigt werden
@@ -820,74 +824,91 @@ def planverb_zufaellig(tabelle_, lkwplan_, lkwplan_bew, max_tausche):
             # Tausch mit vorheriger Reihe
             if pal_col_idx > 0:
                 col_idx_neu = pal_col_idx - 1
-                liste = tauschpartner_andere_reihe(lkwplan_v, lkwplan_n_werte, tabelle_2, pal_row_idx, pal_col_idx,
+                liste = tauschpartner_andere_reihe(lkwplan_a, lkwplan_n_werte_a, tabelle_2, pal_row_idx, pal_col_idx,
                                                    col_idx_neu, n_wert)
                 tauschpartner.extend(liste)
 
             # Tausch mit nächsthöherer Reihe
             if pal_col_idx < 10:
                 col_idx_neu = pal_col_idx + 1
-                liste = tauschpartner_andere_reihe(lkwplan_v, lkwplan_n_werte, tabelle_2, pal_row_idx, pal_col_idx,
+                liste = tauschpartner_andere_reihe(lkwplan_a, lkwplan_n_werte_a, tabelle_2, pal_row_idx, pal_col_idx,
                                                    col_idx_neu, n_wert)
                 tauschpartner.extend(liste)
+
 
             # zufälligen Tauschpartner bestimmen
             randidx = randint(0, len(tauschpartner) - 1)
 
             if type(tauschpartner[randidx][0]) == int:
-                speicher = lkwplan_v.iloc[pal_row_idx, pal_col_idx]
-                lkwplan_v.iloc[pal_row_idx, pal_col_idx] = lkwplan_v.iloc[
-                    tauschpartner[randidx][0], tauschpartner[randidx][1]]
-                lkwplan_v.iloc[tauschpartner[randidx][0], tauschpartner[randidx][1]] = speicher
+                lkwplan_v.iloc[pal_row_idx, pal_col_idx] = lkwplan_a.iloc[tauschpartner[randidx][0], tauschpartner[randidx][1]]
+                lkwplan_v.iloc[tauschpartner[randidx][0], tauschpartner[randidx][1]] = lkwplan_a.iloc[pal_row_idx, pal_col_idx]
+
+                lkwplan_n_werte_v.iloc[pal_row_idx, pal_col_idx] = lkwplan_n_werte_a.iloc[tauschpartner[randidx][0], tauschpartner[randidx][1]]
+                lkwplan_n_werte_v.iloc[tauschpartner[randidx][0], tauschpartner[randidx][1]] = lkwplan_n_werte_a.iloc[pal_row_idx, pal_col_idx]
 
             else:  # Dreiertausch benötigt: A=Ausgangspal, B=gleiches n, C=anderes n (bleibt in der Reihe)
-                # setze A in den Speicher
-                # setze B auf A
-                # setze C auf B
-                # setze Speicher(A) auf C
+                # setze A_a auf C_v
+                # setze B_a auf A_v
+                # setze C_a auf B_v
 
-                speicher = lkwplan_v.iloc[pal_row_idx, pal_col_idx]
-                lkwplan_v.iloc[pal_row_idx, pal_col_idx] = lkwplan_v.iloc[
-                    tauschpartner[randidx][0][0], tauschpartner[randidx][0][1]]
-                lkwplan_v.iloc[tauschpartner[randidx][0][0], tauschpartner[randidx][0][1]] = lkwplan_v.iloc[
-                    tauschpartner[randidx][1][0], tauschpartner[randidx][1][1]]
-                lkwplan_v.iloc[tauschpartner[randidx][1][0], tauschpartner[randidx][1][1]] = speicher
+                lkwplan_v.iloc[tauschpartner[randidx][1][0], tauschpartner[randidx][1][1]] = lkwplan_a.iloc[pal_row_idx, pal_col_idx]
+                lkwplan_v.iloc[pal_row_idx, pal_col_idx] = lkwplan_a.iloc[tauschpartner[randidx][0][0], tauschpartner[randidx][0][1]]
+                lkwplan_v.iloc[tauschpartner[randidx][0][0], tauschpartner[randidx][0][1]] = lkwplan_a.iloc[tauschpartner[randidx][1][0], tauschpartner[randidx][1][1]]
+
+                lkwplan_n_werte_v.iloc[tauschpartner[randidx][1][0], tauschpartner[randidx][1][1]] = lkwplan_n_werte_a.iloc[pal_row_idx, pal_col_idx]
+                lkwplan_n_werte_v.iloc[pal_row_idx, pal_col_idx] = lkwplan_n_werte_a.iloc[tauschpartner[randidx][0][0], tauschpartner[randidx][0][1]]
+                lkwplan_n_werte_v.iloc[tauschpartner[randidx][0][0], tauschpartner[randidx][0][1]] = lkwplan_n_werte_a.iloc[tauschpartner[randidx][1][0], tauschpartner[randidx][1][1]]
+
 
             # Bewertung des veränderten Plans
             lkwplan_v = gewichte_optimieren(tabelle_, lkwplan_v, plan_bewertung(tabelle_, lkwplan_v))
             lkwplan_v_bew = plan_bewertung(tabelle_, lkwplan_v)
 
-            # if sum(lkwplan_v_bew[0:6]) <= 0.001 and lkwplan_v_bew[-1] <= diff_optimal_ab:
-                # return lkwplan_v, lkwplan_v_bew
             if math.floor(lkwplan_v_bew[1]) + math.floor(lkwplan_v_bew[2]) + sum(lkwplan_v_bew[4:6]) <= 0.001 and lkwplan_v_bew[-1] <= diff_optimal_ab:
-                # eine bessere Lsg kann hier nicht erzeugt werden, weil Anz. fehlender Pal. & Pal.-Verteilung oben bisher konstant bleibt
+                # bei dem gewählten Vorgehen bleiben Palettenanz. (idx0) und benötigte Ladungssicherung oben (idx3) identisch
+                # eine bessere Lsg kann hier nicht erzeugt werden
                 return lkwplan_v, lkwplan_v_bew
-
+            else:
                 # Abbruch der gesamten Funktion mit return lwkplan_v, wenn alle "Optimal"-Kriterien erfüllt sind
                 # wenn noch nicht optimal aber besser als vorher, wollen wir das als neues Ergebnis speichern
                 # und damit in den nächsten Durchlauf der while-Schleife gehen
-
-            else:
                 # zunächst noch Ladebalken-Verbesserung durchführen
                 # nur wenn die anderen beiden notwendigen Indizes 1 und 5 passend erfüllt sind
-                # if lkwplan_v_bew[4] != 0 and sum(lkwplan_v_bew[:3]) + lkwplan_v_bew[5] == 0 and lkwplan_v_bew[3] <= 0.001:
                 if lkwplan_v_bew[4] != 0 and math.floor(lkwplan_v_bew[1]) + lkwplan_v_bew[5] == 0:
                     lkwplan_v = ladebalken_ausgleich(tabelle_, lkwplan_v)
                     lkwplan_v_bew = plan_bewertung(tabelle_, lkwplan_v)
                     if lkwplan_v_bew[4] == 0:
                         lkwplan_v = gewichte_optimieren(tabelle_, lkwplan_v, lkwplan_v_bew)
+                        lkwplan_v_bew = plan_bewertung(tabelle_, lkwplan_v)
+
 
                 # gucken ob neuer Plan besser ist als vorher: wenn ja dann damit weitermachen, sonst mit dem alten
+                # bei dem gewählten Vorgehen bleiben Palettenanz. (idx0) und benötigte Ladungssicherung oben (idx3) identisch
+                verbessert=False
+                if lkwplan_v_bew[1]<=lkwplan_a_bew[1] and lkwplan_v_bew[4]<=lkwplan_a_bew[4] and lkwplan_v_bew[5]<=lkwplan_a_bew[5]:
+                    if lkwplan_v_bew[1]<lkwplan_a_bew[1] or lkwplan_v_bew[4]<lkwplan_a_bew[4] or lkwplan_v_bew[5]<lkwplan_a_bew[5]:
+                        verbessert=True
+                    elif lkwplan_v_bew[2]<lkwplan_a_bew[2]:
+                        verbessert=True
+                    elif lkwplan_v_bew[2]==lkwplan_a_bew[2] and lkwplan_v_bew[6]<lkwplan_a_bew[6]:
+                        verbessert=True
 
-                if sum(lkwplan_v_bew[:6]) > sum(lkwplan_bew[:6]) or (sum(lkwplan_v_bew[0:6]) == sum(lkwplan_bew[0:6]) and lkwplan_v_bew[-1] >= lkwplan_bew[-1]):
-                    # keine Verbesserung -> setze alten Plan als lkwplan_v und nutze ihn erneut für den nächsten Durchgang
-                    lkwplan_v = pd.DataFrame(lkwplan_.copy(deep=True))
+                if verbessert:
+                    # Verbesserung erzielt: setze lkwplan_v als den Ausgangsplan lkwplan_a und nutze ihn für den nächsten Durchgang
+                    lkwplan_a = pd.DataFrame(lkwplan_v.copy(deep=True))
+                    lkwplan_a_bew = lkwplan_v_bew
+                    lkwplan_n_werte_a = pd.DataFrame(lkwplan_n_werte_v.copy(deep=True))
+
+                else: # lkwplan_v wieder auf lkwplan_a zurücksetzen, damit Verbesserungsschritte der nächsten Runde keine Altlasten beinhalten
+                    lkwplan_v = pd.DataFrame(lkwplan_a.copy(deep=True))
+                    lkwplan_n_werte_v = pd.DataFrame(lkwplan_n_werte_a.copy(deep=True))
+                    # lkwplan_v_bew wird im nächsten Durchgang sowieso neu bestimmt, bevor etwas davon benötigt wird
 
 
             tauschnr += 1
         # nächster Durchlauf der while-Schleife
 
-    return lkwplan_v, lkwplan_v_bew
+    return lkwplan_a, lkwplan_a_bew
 
 
 
@@ -904,40 +925,73 @@ def planauswahl_final(tabelle, planliste, planliste_v2, planliste_v3, diff_optim
         for pl in planliste:
 
             # nur Ladebalken-Verstoß:
-            if pl[1][4] != 0 and sum(pl[1][:3]) + pl[1][5] == 0 and pl[1][3] <= 0.001:
+            # if pl[1][4] != 0 and sum(pl[1][:3]) + pl[1][5] == 0 and pl[1][3] <= 0.001:
+            if pl[1][4] != 0 and math.floor(pl[1][1]) + pl[1][5] == 0:
                 pl[0] = ladebalken_ausgleich(tabelle, pl[0])
                 pl[1] = plan_bewertung(tabelle, pl[0])
+                if pl[1][4] == 0:
+                    pl[0] = gewichte_optimieren(tabelle, pl[0], pl[1])
+                    pl[1] = plan_bewertung(tabelle, pl[0])
 
-            # pl[0]=gewichte_optimieren(tabelle,pl[0],pl[1]) #jeden Plan zunächst optimieren
+            # pl[0]=gewichte_optimieren(tabelle,pl[0],pl[1])  # könnte hier jeden Plan zunächst optimieren
             # ist überflüssig, weil 1. Wahl-Liste schon vor dieser Funktion optimiert wird
             # anderen Listen haben noch weitere "Probleme", benötigen also planverb_zufaellig und dort ist es integriert
 
-            if sum(pl[1][0:6]) <= 0.001 and pl[1][-1] <= diff_optimal_ab:  # könnte man aus dem gleichen Grund weglassen
+            if sum(pl[1][0:6]) <= 0.001 and pl[1][-1] <= diff_optimal_ab:
                 return pl[0], pl[1]
             else:
                 pl[0], pl[1] = planverb_zufaellig(tabelle, pl[0], pl[1], max_tausche)  # beinhaltet auch gewichte_optimieren
+
+                # verschiedenste Pläne miteinander vergleichen - idx0 & idx3 können sich jetzt also auch ändern
+                verbessert=False
                 if sum(pl[1][0:6]) <= 0.001 and pl[1][-1] <= diff_optimal_ab:
                     return pl[0], pl[1]
 
-                elif sum(pl[1][:6]) < sum(bester_plan_bew[:6]) or (
-                        sum(pl[1][0:6]) == sum(bester_plan_bew[0:6]) and pl[1][-1] < bester_plan_bew[-1]):
+                elif pl[1][0]<bester_plan_bew[0]: # mehr Paletten mitnehmen können ist immer besser (wenn notw. Kriterien erfüllt sind)
+                    if pl[1][1] <= bester_plan_bew[1] and pl[1][4] <= bester_plan_bew[4] and pl[1][5] <= bester_plan_bew[5]:
+                        verbessert=True
+
+                elif pl[1][0] == bester_plan_bew[0]:
+                    if pl[1][1] <= bester_plan_bew[1] and pl[1][4] <= bester_plan_bew[4] and pl[1][5] <= bester_plan_bew[5]:
+                        if pl[1][1] < bester_plan_bew[1] or pl[1][4] < bester_plan_bew[4] or pl[1][5] < bester_plan_bew[5]:
+                            verbessert = True
+                        elif sum(pl[1][2:4]) < sum(bester_plan_bew[2:4]): #kühl-trocken + Ladungssicherung oben
+                            verbessert=True
+                        elif sum(pl[1][2:4]) == sum(bester_plan_bew[2:4]) and pl[1][6]<bester_plan_bew[6]: # Gewichtsdiff. verkleinert
+                            verbessert = True
+
+                if verbessert:
                     # setze pl[0] als neuen besten Plan
                     bester_plan = pd.DataFrame(pl[0].copy(deep=True))
                     bester_plan_bew = pl[1]
 
+
     if len(planliste_v2) > 0:
-        if len(planliste) == 0:
+        if len(planliste) == 0: # hier hätten wir bester_plan noch nicht belegt
             bester_plan = pd.DataFrame(planliste_v2[0][0].copy(deep=True))
             bester_plan_bew = planliste_v2[0][1]
 
         bester_pl_v2, bester_pl_v2_bew = planauswahl_final(tabelle, planliste_v2, planliste_v3, [], diff_optimal_ab, max_tausche)
 
+        verbessert = False
         if sum(bester_pl_v2_bew[0:6]) <= 0.001 and bester_pl_v2_bew[-1] <= diff_optimal_ab:
             return bester_pl_v2, bester_pl_v2_bew
 
-        elif sum(bester_pl_v2_bew[:6]) < sum(bester_plan_bew[:6]) or (
-                sum(bester_pl_v2_bew[0:6]) == sum(bester_plan_bew[0:6]) and bester_pl_v2_bew[-1] < bester_plan_bew[-1]):
-            # setze pl[0] als neuen besten Plan
+        elif bester_pl_v2_bew[0] < bester_plan_bew[0]:  # mehr Paletten mitnehmen können ist immer besser (wenn notw. Kriterien erfüllt sind)
+            if bester_pl_v2_bew[1] <= bester_plan_bew[1] and bester_pl_v2_bew[4] <= bester_plan_bew[4] and bester_pl_v2_bew[5] <= bester_plan_bew[5]:
+                verbessert = True
+
+        elif bester_pl_v2_bew[0] == bester_plan_bew[0]:
+            if bester_pl_v2_bew[1] <= bester_plan_bew[1] and bester_pl_v2_bew[4] <= bester_plan_bew[4] and bester_pl_v2_bew[5] <= bester_plan_bew[5]:
+                if bester_pl_v2_bew[1] < bester_plan_bew[1] or bester_pl_v2_bew[4] < bester_plan_bew[4] or bester_pl_v2_bew[5] < bester_plan_bew[5]:
+                    verbessert = True
+                elif sum(bester_pl_v2_bew[2:4]) < sum(bester_plan_bew[2:4]):  # kühl-trocken + Ladungssicherung oben
+                    verbessert = True
+                elif sum(bester_pl_v2_bew[2:4]) == sum(bester_plan_bew[2:4]) and bester_pl_v2_bew[6] < bester_plan_bew[6]:  # Gewichtsdiff. verkleinert
+                    verbessert = True
+
+        if verbessert:
+            # setze bester_pl_v2 als neuen besten Plan
             bester_plan = pd.DataFrame(bester_pl_v2.copy(deep=True))
             bester_plan_bew = bester_pl_v2_bew
 
@@ -1234,6 +1288,17 @@ for tour_idx in range(0,anzahl_touren):
         fazit[tour_idx]=f'Optimale Lösung gefunden, Gewichtsdifferenz beträgt {plan_final_bew[-1]: .2f} %  -  entspricht ca. {plan_final_bew[-1] / 100 * sum(tabelle["m_i"]): .2f} kg Mehrgewicht auf einer Seite'
     elif sum(plan_final_bew[0:6]) <= 0.001 and plan_final_bew[-1] <= diff_zulaessig_ab:
         fazit[tour_idx]=f'Zulässige Lösung gefunden, Gewichtsdifferenz beträgt {plan_final_bew[-1]: .2f} %  -  entspricht ca.{plan_final_bew[-1] / 100 * sum(tabelle["m_i"]): .2f} kg Mehrgewicht auf einer Seite'
+    elif sum(plan_final_bew[0:2])+sum(plan_final_bew[4:5]) <= 0.001 and plan_final_bew[-1] <= diff_zulaessig_ab:
+        if plan_final_bew[2]>0 and plan_final_bew[3]>0.001:
+            problem = 'Kühl-trocken-Trennung verletzt und zusätzliche Ladungssicherung benötigt'
+        elif plan_final_bew[2]>0:
+            problem = f'Kühl-trocken-Trennung bei {plan_final_bew[2]} Paletten nicht eingehalten.'
+        elif plan_final_bew[3]>0.001:
+            problem = 'Oben zusätzliche Ladungssicherung benötigt.'
+        else:
+            problem='' # kann eigentlich nicht passieren
+        fazit[tour_idx] = f'Lösung gefunden, Einschränkung: {problem} \nGewichtsdifferenz beträgt {plan_final_bew[-1]: .2f} %  -  entspricht ca.{plan_final_bew[-1] / 100 * sum(tabelle["m_i"]): .2f} kg Mehrgewicht auf einer Seite'
+
     else:
         fazit[tour_idx]=f'Keine zulässige Lösung gefunden. Die beste bisherige Lösung hat folgende Bewertung: {plan_final_bew}'
 
