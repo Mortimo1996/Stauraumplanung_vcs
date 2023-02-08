@@ -409,7 +409,7 @@ def plan_bewertung(tabelle_, lkwplan_):
     bewertung[0] = freieplaetze - (66 - anz_pal)
 
     # R idx1: alle Hochpaletten haben einen zulässigen Platz (stehen unten & obere Reihe komplett leer)
-    hpaletten = tabelle_[tabelle_['h_i'] > 0].reset_index(inplace=False, drop=True)
+    hpaletten = tabelle_.loc[tabelle_['h_i'] > 0].reset_index(inplace=False, drop=True)
 
     for hpal in range(hpaletten.shape[0]):  # für jede HPal einzeln, daher rowhp und colhp immer nur ein Element
 
@@ -429,12 +429,13 @@ def plan_bewertung(tabelle_, lkwplan_):
                 bewertung[1] += 1
 
     # R idx2: kühl-trocken-Trennung auch nach Austausch berücksichtigt
-    kuehlpaletten = tabelle_[tabelle_['t_i'] > 0].reset_index(inplace=False, drop=True)
+    kuehlpaletten = tabelle_.loc[tabelle_['t_i'] > 0].reset_index(inplace=False, drop=True)
 
     for tpal in range(kuehlpaletten.shape[0]):  # für jede Kühlpalette einzeln
-
+        tpal_fehler = False
         try:
             col_tpal = int(list(lkwplan_.columns[lkwplan_.isin([kuehlpaletten.loc[tpal, 'i']]).any()])[0])
+            # col_tpal ist hier der Reihenname (1-11) als Zahl dargestellt
         except:
             bewertung[2] += 0.01  # als Kennzeichen, dass Kühlpalette nicht mehr eingeplant werden konnte
         else:
@@ -442,15 +443,16 @@ def plan_bewertung(tabelle_, lkwplan_):
             tabelle_vgl = tabelle_.set_index('i', inplace=False, drop=False)
             if col_tpal <= 10:
                 for jedes in lkwplan_.loc[:, str(col_tpal + 1)]:
-
                     if jedes != 'x' and jedes != 'o':
 
                         if tabelle_vgl.loc[jedes, 'n_i'] > tabelle_vgl.loc[kuehlpaletten.loc[tpal, 'i'], 'n_i']:
-                            bewertung[2] += 1
+                            tpal_fehler = True
 
                         elif tabelle_vgl.loc[jedes, 'n_i'] == tabelle_vgl.loc[kuehlpaletten.loc[tpal, 'i'], 'n_i']:
                             if tabelle_vgl.loc[jedes, 't_i'] < 1:
-                                bewertung[2] += 1
+                                tpal_fehler = True
+                if tpal_fehler:
+                    bewertung[2] += 1 # für jede Kühlpal um 1 hochzählen, bei der die n bzw. t der nächsthöheren Reihe nicht passen
 
     # R idx3: Anz zusätzl benötigter Ladungssicherung durch ganz freie Reihen mittendrin
 
@@ -1335,7 +1337,7 @@ for tour_idx in range(0,anzahl_touren):
             problem = 'Oben zusätzliche Ladungssicherung benötigt.'
         else:
             problem='' # kann eigentlich nicht passieren
-        fazit[tour_idx] = f'Lösung gefunden, Einschränkung: {problem} \nGewichtsdifferenz beträgt {plan_final_bew[-1]: .2f} %  -  entspricht ca.{plan_final_bew[-1] / 100 * sum(tabelle["m_i"]): .2f} kg Mehrgewicht auf einer Seite'
+        fazit[tour_idx] = f'Lösung gefunden, Einschränkung: {problem} \n{plan_final_bew}\nGewichtsdifferenz beträgt {plan_final_bew[-1]: .2f} %  -  entspricht ca.{plan_final_bew[-1] / 100 * sum(tabelle["m_i"]): .2f} kg Mehrgewicht auf einer Seite'
 
     else:
         fazit[tour_idx]=f'Keine zulässige Lösung gefunden. Die beste bisherige Lösung hat folgende Bewertung: {plan_final_bew}'
@@ -1425,6 +1427,8 @@ new_tar.close()
 percent.set("Verfahren abgeschlossen")
 window.update_idletasks()
 
+print(f'Verfahrensdauer in Summe: {time.time()-starttime}')
+
 window.mainloop()
 
 
@@ -1455,4 +1459,4 @@ for tour_idx in range(0,anzahl_touren):
 
     print(' ')
 
-print(f'Benötigte Gesamtzeit: {time.time()-starttime}')
+# print(f'Benötigte Gesamtzeit: {time.time()-starttime}') - eher ungünstig, da abhängig von "Close" des Fensters
