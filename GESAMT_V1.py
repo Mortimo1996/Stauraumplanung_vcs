@@ -1155,24 +1155,33 @@ for tour_idx in range(0,anzahl_touren):
                        'ascending': [False]},
                  'P': {'by': ['n_i'],
                        'ascending': [False]},
-                 'Sonderfall':{}}
+                 'Sonderfall1': {'by': 'x'},
+                 'Sonderfall2': {'by': 'x'}}
+    # könnte als Sonderfall3 z. B. noch prüfen, wie oft n innerhalb der nächsten Paletten wechselt
+    # und dann ggf. nicht nach jedem n zwischen auf- und absteigend wechseln
+    # z. B.
+    # n1: 10 Pal, davon 5 HPal; n2: 2 HPal; n3: 10 Pal, davon 4 HPal; n4: 10 Pal, keine HPal
+    # n1 aufsteigend, n2 egal, n3 sollte absteigend und NICHT wieder aufsteigend sein
 
     lkwplan = pd.DataFrame({str(reihe_k): ['o' for o in range(6)] for reihe_k in range(1, 12)})
     plaene = []
 
     for var in varianten:
 
-        if var != 'Sonderfall':
+        if var != 'Sonderfall1' and var != 'Sonderfall2':  # oder: type(varianten[var]['by'])!=str:
             tabelle = tabelle.sample(frac=1)  # Zeilen zufällig mischen, um ihre Reihenfolge zu verändern
             tabelle.sort_values(by=varianten[var]['by'], ascending=varianten[var]['ascending'], inplace=True)
             tabelle.reset_index(inplace=True, drop=True)
         else:
-            # print('SONDERFALL')
+            # print(var)
             for n_einzeln in range(1, max(tabelle['n_i']) + 1):
 
-                if n_einzeln % 2 == 0:  # für gerade n
+                rest = (0 if var == 'Sonderfall1' else 1)
+                # ändert, ob HPal von 1&2 beieinander stehen oder von 2&3 usw.
+
+                if n_einzeln % 2 == rest:  # ==0 für gerade n
                     tabelle_n = tabelle.loc[tabelle['n_i'] == n_einzeln].sort_values(by='h_i', ascending=True)
-                else:  # für ungerade n
+                else:
                     tabelle_n = tabelle.loc[tabelle['n_i'] == n_einzeln].sort_values(by='h_i', ascending=False)
 
                 if n_einzeln == 1:  # im ersten Durchlauf zunächst tabelle_alle erzeugen
