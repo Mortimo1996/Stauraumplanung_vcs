@@ -1154,18 +1154,41 @@ for tour_idx in range(0,anzahl_touren):
                  'O': {'by': ['n_i'],
                        'ascending': [False]},
                  'P': {'by': ['n_i'],
-                       'ascending': [False]}}
-
+                       'ascending': [False]},
+                 'Sonderfall':{}}
 
     lkwplan = pd.DataFrame({str(reihe_k): ['o' for o in range(6)] for reihe_k in range(1, 12)})
     plaene = []
 
     for var in varianten:
-        tabelle = tabelle.sample(frac=1)  # Zeilen zufällig mischen, um ihre Reihenfolge zu verändern
-        tabelle.sort_values(by=varianten[var]['by'], ascending=varianten[var]['ascending'], inplace=True)
-        tabelle.reset_index(inplace=True, drop=True)
 
-        for planoption in range(1, 4):  # 1 bis 4 ist hier für: plan_fuellen(...,option):
+        if var != 'Sonderfall':
+            tabelle = tabelle.sample(frac=1)  # Zeilen zufällig mischen, um ihre Reihenfolge zu verändern
+            tabelle.sort_values(by=varianten[var]['by'], ascending=varianten[var]['ascending'], inplace=True)
+            tabelle.reset_index(inplace=True, drop=True)
+        else:
+            # print('SONDERFALL')
+            for n_einzeln in range(1, max(tabelle['n_i']) + 1):
+
+                if n_einzeln % 2 == 0:  # für gerade n
+                    tabelle_n = tabelle.loc[tabelle['n_i'] == n_einzeln].sort_values(by='h_i', ascending=True)
+                else:  # für ungerade n
+                    tabelle_n = tabelle.loc[tabelle['n_i'] == n_einzeln].sort_values(by='h_i', ascending=False)
+
+                if n_einzeln == 1:  # im ersten Durchlauf zunächst tabelle_alle erzeugen
+                    tabelle_alle = pd.DataFrame(tabelle_n.copy(deep=True))
+                else:
+                    tabelle_alle = pd.concat([tabelle_alle, tabelle_n])
+
+            tabelle = tabelle_alle.reset_index(inplace=False, drop=True)
+
+
+        planoption = 1
+        anz_opt_plan_fuellen = 3
+        while planoption <= anz_opt_plan_fuellen:
+            # vorher: for planoption in range(1, 4):  # 1 bis einschl. 3 ist hier für: plan_fuellen(...,option):
+            # von for zu while geändert, um bei früh gefundener 'optimaler' Lsg. (break) auch die for-Schleife beenden zu können
+            # ermöglicht Zeitersparnis, aber auch ggf. etwas schlechtere (dennoch als 'optimal' geltende) Lösungen
 
             plaene.append([pd.DataFrame(lkwplan.copy(deep=True)), None])
 
@@ -1198,14 +1221,20 @@ for tour_idx in range(0,anzahl_touren):
             if zweioptionen:
                 plaene[-2][0] = plan_fuellen(tabelle, plaene[-2][0], anz_pal, oben, planoption)
                 plaene[-2][1] = plan_bewertung(tabelle, plaene[-2][0])
-                if (sum(plaene[-2][1][0:6]) <= 0.001 and plaene[-2][1][-1] <= diff_optimal_ab):
-                    # break bricht nur die innere "for var in varianten"-Schleife ab
+                """if (sum(plaene[-2][1][0:6]) <= 0.001 and plaene[-2][1][-1] <= diff_optimal_ab):
+                    # break bricht nur die innere "while planoption<=4"-Schleife ab
                     break
 
             if (sum(plaene[-1][1][0:6]) <= 0.001 and plaene[-1][1][-1] <= diff_optimal_ab):
-                # Sortierung nach if zweioptionen gewählt, um beide Optionen noch mitzunehmen
-                # break bricht nur die innere "for var in varianten"-Schleife ab
-                break
+                # Sortierung dieses ifs nach if zweioptionen gewählt, um beide Optionen noch mitzunehmen
+                # break bricht nur die innere "while planoption<=4"-Schleife ab
+                break"""
+
+            planoption += 1
+
+        if planoption < anz_opt_plan_fuellen:
+            # break bricht bei zuvor schon gefundener optimaler Lsg. jetzt auch die "for var in varianten"-Schleife ab
+            break
 
 
 
