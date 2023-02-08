@@ -1345,13 +1345,15 @@ for tour_idx in range(0,anzahl_touren):
 
 
     # Überschreiben der pss-Datei vorbereiten
+    # Befüllen bei Spediteur "Andere" läuft oben im Code separat
     tabelle.set_index('i', inplace=True)
     ladenr=0
     for col in range(0, 11):
-        for row in [1, 0, 2, 4, 3, 5]:
+        for row in [1, 0, 2, 4, 3, 5]: # andere Sortierung der Reihen hilfreich für Anpassung der Ladereihenfolge
+            ladenr += 1 # hier hochzählen, wenn Nr. freier Plätze übersprungen werden soll (z. B. 1,2,3,x,x,x,7,8)
             wert = plan_final.iloc[row, col]
             if type(wert) != str:
-                ladenr += 1
+                # ladenr += 1 # hier hochzählen, wenn Nr. freier Plätze nicht übersprungen wird (1,2,3,x,x,x,4,5)
                 psszeile = tabelle.loc[wert, 'zeile']
                 gesamtzeilenliste.remove(psszeile)
 
@@ -1459,4 +1461,4 @@ for tour_idx in range(0,anzahl_touren):
 
     print(' ')
 
-# print(f'Benötigte Gesamtzeit: {time.time()-starttime}') - eher ungünstig, da abhängig von "Close" des Fensters
+# print(f'Benötigte Gesamtzeit: {time.time()-starttime}') - weiter oben passender, da hier abhängig von "Close" des Fensters
