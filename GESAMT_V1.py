@@ -48,22 +48,22 @@ ______________________________________________________________________________
 """
 
 #tar_pfad='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten 2017/20171115_1nach/tar.asc'
-#tar_pfad='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten August 2022/Daten vor Stauraumplanung/tar.asc'
-tar_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten November 2022/Daten vor Stauraumplanung/tar.asc'
+tar_pfad='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten August 2022/Daten vor Stauraumplanung/tar.asc'
+#tar_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten November 2022/Daten vor Stauraumplanung/tar.asc'
 tar = open(tar_pfad, 'r')
 tar_vor = tar.readlines()
 tar.close()
 
 #blk_pfad='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten 2017/20171115_1nach/blk.asc'
-#blk_pfad='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten August 2022/Daten vor Stauraumplanung/blk.asc'
-blk_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten November 2022/Daten vor Stauraumplanung/blk.asc'
+blk_pfad='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten August 2022/Daten vor Stauraumplanung/blk.asc'
+#blk_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten November 2022/Daten vor Stauraumplanung/blk.asc'
 blk = open(blk_pfad, 'r')
 blk_vor = blk.readlines()
 blk.close()
 
 #pss_pfad='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten 2017/20171115_1nach/pss.asc'
-#pss_pfad='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten August 2022/Daten vor Stauraumplanung/pss.asc'
-pss_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten November 2022/Daten vor Stauraumplanung/pss.asc'
+pss_pfad='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten August 2022/Daten vor Stauraumplanung/pss.asc'
+#pss_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten November 2022/Daten vor Stauraumplanung/pss.asc'
 pss = open(pss_pfad, 'r')
 pss_vor = pss.readlines()
 pss.close()
@@ -1232,14 +1232,14 @@ for tour_idx in range(0,anzahl_touren):
             if zweioptionen:
                 plaene[-2][0] = plan_fuellen(tabelle, plaene[-2][0], anz_pal, oben, planoption)
                 plaene[-2][1] = plan_bewertung(tabelle, plaene[-2][0])
-                """if (sum(plaene[-2][1][0:6]) <= 0.001 and plaene[-2][1][-1] <= diff_optimal_ab):
+                if (sum(plaene[-2][1][0:6]) <= 0.001 and plaene[-2][1][-1] <= diff_optimal_ab):
                     # break bricht nur die innere "while planoption<=4"-Schleife ab
                     break
 
             if (sum(plaene[-1][1][0:6]) <= 0.001 and plaene[-1][1][-1] <= diff_optimal_ab):
                 # Sortierung dieses ifs nach if zweioptionen gewählt, um beide Optionen noch mitzunehmen
                 # break bricht nur die innere "while planoption<=4"-Schleife ab
-                break"""
+                break
 
             planoption += 1
 
@@ -1291,7 +1291,7 @@ for tour_idx in range(0,anzahl_touren):
                 waehle_else = False
                 break
 
-    if len(plaene)+len(plaene_zweitewahl)==0 or waehle_else:
+    if (len(plaene)+len(plaene_zweitewahl)==0 or waehle_else) and len(plaene_pal_ueber)>0:
         plaene_pal_ueber = plaene_pal_ueber_sort(plaene_pal_ueber)
 
         # folgenden Zeilen ggf. nur sinnvoll, solange das Verbesserungsverfahren keine Hinzunahme weiterer Paletten ermöglicht
