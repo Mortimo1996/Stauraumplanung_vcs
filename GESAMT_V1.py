@@ -48,22 +48,22 @@ ______________________________________________________________________________
 """
 
 #tar_pfad='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten 2017/20171115_1nach/tar.asc'
-tar_pfad='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten August 2022/Daten vor Stauraumplanung/tar.asc'
-#tar_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten November 2022/Daten vor Stauraumplanung/tar.asc'
+#tar_pfad='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten August 2022/Daten vor Stauraumplanung/tar.asc'
+tar_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten November 2022/Daten vor Stauraumplanung/tar.asc'
 tar = open(tar_pfad, 'r')
 tar_vor = tar.readlines()
 tar.close()
 
 #blk_pfad='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten 2017/20171115_1nach/blk.asc'
-blk_pfad='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten August 2022/Daten vor Stauraumplanung/blk.asc'
-#blk_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten November 2022/Daten vor Stauraumplanung/blk.asc'
+#blk_pfad='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten August 2022/Daten vor Stauraumplanung/blk.asc'
+blk_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten November 2022/Daten vor Stauraumplanung/blk.asc'
 blk = open(blk_pfad, 'r')
 blk_vor = blk.readlines()
 blk.close()
 
 #pss_pfad='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten 2017/20171115_1nach/pss.asc'
-pss_pfad='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten August 2022/Daten vor Stauraumplanung/pss.asc'
-#pss_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten November 2022/Daten vor Stauraumplanung/pss.asc'
+#pss_pfad='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten August 2022/Daten vor Stauraumplanung/pss.asc'
+pss_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten November 2022/Daten vor Stauraumplanung/pss.asc'
 pss = open(pss_pfad, 'r')
 pss_vor = pss.readlines()
 pss.close()
@@ -1125,43 +1125,37 @@ for tour_idx in range(0,anzahl_touren):
 
     #if len(warnungen[tour_idx])==0:
 
-    varianten = {'A': {'by': ['n_i', 't_i', 'm_i'],
-                       'ascending': [False, True, False]},
-                 'B': {'by': ['n_i', 't_i', 'm_i'],
-                       'ascending': [False, True, True]},
-                 'C': {'by': ['n_i', 't_i', 'h_i'],
-                       'ascending': [False, True, False]},
-                 'D': {'by': ['n_i', 't_i', 'h_i'],
-                       'ascending': [False, True, True]},
-                 'E': {'by': ['n_i', 't_i'],
-                       'ascending': [False, True]},
-                 'F': {'by': ['n_i', 't_i'],
-                       'ascending': [False, True]},
-                 'G': {'by': ['n_i', 't_i'],
-                       'ascending': [False, True]},
-                 'H': {'by': ['n_i', 't_i'],
-                       'ascending': [False, True]},
-                 'I': {'by': ['n_i', 't_i'],
-                       'ascending': [False, True]},
-                 'J': {'by': ['n_i', 'h_i'],
-                       'ascending': [False, True]},
-                 'K': {'by': ['n_i', 'h_i'],
-                       'ascending': [False, False]},
-                 'L': {'by': ['n_i', 'm_i'],
-                       'ascending': [False, True]},
-                 'M': {'by': ['n_i', 'm_i'],
-                       'ascending': [False, False]},
-                 'N': {'by': ['n_i'],
-                       'ascending': [False]},
-                 'O': {'by': ['n_i'],
-                       'ascending': [False]},
-                 'P': {'by': ['n_i'],
-                       'ascending': [False]},
-                 'Sonderfall1': {'by': 'x'},
-                 'Sonderfall2': {'by': 'x'}}
-    # könnte als Sonderfall3 z. B. noch prüfen, wie oft n innerhalb der nächsten Paletten wechselt
-    # und dann ggf. nicht nach jedem n zwischen auf- und absteigend wechseln
-    # z. B.
+    varianten = {'A': {'by': ['n_i', 't_i', 'm_i'], 'ascending': [False, True, False]},
+                 'B': {'by': ['n_i', 't_i', 'm_i'], 'ascending': [False, True, True]},
+                 'C': {'by': ['n_i', 't_i', 'h_i'], 'ascending': [False, True, False]},
+                 'D': {'by': ['n_i', 't_i', 'h_i'], 'ascending': [False, True, True]},
+                 'E': {'by': ['n_i', 't_i'], 'ascending': [False, True]},
+                 'F': {'by': ['n_i', 't_i'], 'ascending': [False, True]},
+                 'G': {'by': ['n_i', 't_i'], 'ascending': [False, True]},
+                 'H': {'by': ['n_i', 't_i'], 'ascending': [False, True]},
+                 'I': {'by': ['n_i', 't_i'], 'ascending': [False, True]},
+                 'N': {'by': ['n_i'], 'ascending': [False]},
+                 'O': {'by': ['n_i'], 'ascending': [False]},
+                 'P': {'by': ['n_i'], 'ascending': [False]},
+                 'S1': {'by': 'x'},
+                 'S2': {'by': 'x'},
+                 'S3': {'by': 'x'},
+                 'S4': {'by': 'x'}}
+    # wichtig: sort by für alle außer Sonderfälle S1,S2,... mit einer Liste füllen (z. B. 'by': ['n_i']), damit die
+    # folgende for var in varianten Schleife richtig durchläuft
+
+    """'J': {'by': ['n_i', 'h_i'], 'ascending': [False, True]},
+                 'K': {'by': ['n_i', 'h_i'], 'ascending': [False, False]},
+                 'L': {'by': ['n_i', 'm_i'], 'ascending': [False, True]},
+                 'M': {'by': ['n_i', 'm_i'], 'ascending': [False, False]},"""
+
+    # aktuell: die 'normalen' Fälle beschreiben identische Sortierkriterien für die ganze Tabelle (für alle n)
+    # Sonderfälle wählen unterschiedliche Sortierstrategien für unterschiedliche n
+    # S1 & S2 wechseln systematisch nach jedem n
+    # S3 & S4 beschreiben zufällige Entscheidungen je n
+
+    # könnte als weiteren Sonderfall z. B. noch prüfen, wie oft n innerhalb der nächsten Paletten wechselt
+    # und dann ggf. nicht nach jedem n zwischen auf- und absteigend wechseln, z. B.
     # n1: 10 Pal, davon 5 HPal; n2: 2 HPal; n3: 10 Pal, davon 4 HPal; n4: 10 Pal, keine HPal
     # n1 aufsteigend, n2 egal, n3 sollte absteigend und NICHT wieder aufsteigend sein
 
@@ -1170,15 +1164,30 @@ for tour_idx in range(0,anzahl_touren):
 
     for var in varianten:
 
-        if var != 'Sonderfall1' and var != 'Sonderfall2':  # oder: type(varianten[var]['by'])!=str:
+        if type(varianten[var]['by'])!=str:  # oder: var != 'Sonderfall1' and var != 'Sonderfall2':
             tabelle = tabelle.sample(frac=1)  # Zeilen zufällig mischen, um ihre Reihenfolge zu verändern
             tabelle.sort_values(by=varianten[var]['by'], ascending=varianten[var]['ascending'], inplace=True)
             tabelle.reset_index(inplace=True, drop=True)
-        else:
+
+        elif var == 'S3' or var == 'S4':
+            for n_einzeln in range(1, max(tabelle['n_i']) + 1):
+                if randint(0, 1) == 0: # entscheide immer zufällig für jedes n, ob h auf- oder absteigend sortiert wird
+                    tabelle_n = tabelle.loc[tabelle['n_i'] == n_einzeln].sort_values(by='h_i', ascending=True)
+                else:
+                    tabelle_n = tabelle.loc[tabelle['n_i'] == n_einzeln].sort_values(by='h_i', ascending=False)
+
+                if n_einzeln == 1:  # im ersten Durchlauf zunächst tabelle_alle erzeugen
+                    tabelle_alle = pd.DataFrame(tabelle_n.copy(deep=True))
+                else:
+                    tabelle_alle = pd.concat([tabelle_alle, tabelle_n])
+
+            tabelle = tabelle_alle.reset_index(inplace=False, drop=True)
+
+        else: # bei S1 und S2
             # print(var)
             for n_einzeln in range(1, max(tabelle['n_i']) + 1):
 
-                rest = (0 if var == 'Sonderfall1' else 1)
+                rest = (0 if var == 'S1' else 1)
                 # ändert, ob HPal von 1&2 beieinander stehen oder von 2&3 usw.
 
                 if n_einzeln % 2 == rest:  # ==0 für gerade n
@@ -1232,14 +1241,14 @@ for tour_idx in range(0,anzahl_touren):
             if zweioptionen:
                 plaene[-2][0] = plan_fuellen(tabelle, plaene[-2][0], anz_pal, oben, planoption)
                 plaene[-2][1] = plan_bewertung(tabelle, plaene[-2][0])
-                if (sum(plaene[-2][1][0:6]) <= 0.001 and plaene[-2][1][-1] <= diff_optimal_ab):
+                """if (sum(plaene[-2][1][0:6]) <= 0.001 and plaene[-2][1][-1] <= diff_optimal_ab):
                     # break bricht nur die innere "while planoption<=4"-Schleife ab
                     break
 
             if (sum(plaene[-1][1][0:6]) <= 0.001 and plaene[-1][1][-1] <= diff_optimal_ab):
                 # Sortierung dieses ifs nach if zweioptionen gewählt, um beide Optionen noch mitzunehmen
                 # break bricht nur die innere "while planoption<=4"-Schleife ab
-                break
+                break"""
 
             planoption += 1
 
