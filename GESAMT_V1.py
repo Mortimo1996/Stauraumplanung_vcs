@@ -194,6 +194,7 @@ def plan_fuellen(tabelle, lkwplan, anz_pal, oben, option):
         while idx_pal < anz_pal:
 
             if oben == 0:
+                oben = -1  # damit dieser Teil nicht nochmal durchlaufen werden muss
                 for row_c in range(3, 6):
                     for col_c in range(col_b, 11):
                         if lkwplan.iloc[row_c, col_c] == 'o':
@@ -207,7 +208,7 @@ def plan_fuellen(tabelle, lkwplan, anz_pal, oben, option):
                 # print('Keine Zuweisung ab Palette {} (d.h. ab Reihenindex {}) möglich.'.format(tabelle.loc[idx_pal,'i'],idx_pal))
                 break
 
-            if row_b == 0 and tabelle.loc[idx_pal:idx_pal + 6, 'h_i'].sum() >= 1:
+            if row_b == 0 and tabelle.loc[idx_pal:idx_pal+5, 'h_i'].sum() >= 1: #(.loc[0:2] umfasst 0,1,2)
                 lkwplan.iloc[3:, col_b] = 'x'
 
             if lkwplan.iloc[row_b, col_b] != 'x':
@@ -229,6 +230,7 @@ def plan_fuellen(tabelle, lkwplan, anz_pal, oben, option):
         while idx_pal < anz_pal:
 
             if oben == 0:
+                oben = -1  # damit dieser Teil nicht nochmal durchlaufen werden muss
                 for row_c in range(3, 6):
                     for col_c in range(col_a, 11):
                         if lkwplan.iloc[row_c, col_c] == 'o':
@@ -242,7 +244,7 @@ def plan_fuellen(tabelle, lkwplan, anz_pal, oben, option):
                 # print('Keine Zuweisung ab Palette {} (d.h. ab Reihenindex {}) möglich.'.format(tabelle.loc[idx_pal,'i'],idx_pal))
                 break
 
-            if row_idx == 0 and tabelle.loc[idx_pal:idx_pal + 6, 'h_i'].sum() >= 1:
+            if row_idx == 0 and tabelle.loc[idx_pal:idx_pal+5, 'h_i'].sum() >= 1: #(.loc[0:2] umfasst 0,1,2)
                 lkwplan.iloc[3:, col_a] = 'x'
 
             if lkwplan.iloc[rows[row_idx], col_a] != 'x':
@@ -258,12 +260,13 @@ def plan_fuellen(tabelle, lkwplan, anz_pal, oben, option):
     elif option == 3:  # nacheinander aufsteigend durch Spalten, dabei zufällige Zeilen
         col_d = 0
         idx_pal = 0
-        row_opt = [0, 1, 2, 3, 4, 5]
+        row_opt = ([0, 1 ,2] if anz_pal<=33 else [0, 1, 2, 3, 4, 5])
 
         while idx_pal < anz_pal:
             restr = False
 
             if oben == 0:
+                oben = -1  # damit dieser Teil nicht nochmal durchlaufen werden muss
                 for row_c in range(3, 6):
                     for col_c in range(col_d, 11):
                         if lkwplan.iloc[row_c, col_c] == 'o':
@@ -272,17 +275,26 @@ def plan_fuellen(tabelle, lkwplan, anz_pal, oben, option):
             if len(row_opt) == 0:
                 col_d += 1
 
-                if oben == 2 and anz_pal % 3 == 2:  # Optionen für Restreihe
+                if anz_pal < 33 and anz_pal % 3 == 2 and (anz_pal - idx_pal) == 2:  # Optionen für Restreihe unten
+                    if randint(0, 1) == 0:
+                        row_opt = [0, 1]
+                    else:
+                        row_opt = [1, 2]
+                elif anz_pal < 33 and anz_pal % 3 == 1 and (anz_pal - idx_pal) == 1:  # Optionen für Restreihe unten
+                    row_opt = [0, 2]
+
+                elif oben == 2 and anz_pal % 3 == 2:  # Optionen für Restreihe oben
                     restr = True
                     if randint(0, 1) == 0:
                         row_opt = [0, 1, 2, 4, 5]
                     else:
                         row_opt = [0, 1, 2, 3, 4]
-                elif oben == 1 and anz_pal % 3 == 1:  # Optionen für Restreihe
+                elif oben == 1 and anz_pal % 3 == 1:  # Optionen für Restreihe oben
                     restr = True
                     row_opt = [0, 1, 2, 3, 5]
+
                 else:  # alle anderen außer der Restreihe
-                    row_opt = [0, 1, 2, 3, 4, 5]
+                    row_opt = ([0, 1, 2] if anz_pal <= 33 else [0, 1, 2, 3, 4, 5])
 
             if col_d >= lkwplan.shape[1]:
                 # print('Keine Zuweisung ab Palette {} (d.h. ab Reihenindex {}) möglich.'.format(tabelle.loc[idx_pal,'i'],idx_pal))
@@ -290,7 +302,7 @@ def plan_fuellen(tabelle, lkwplan, anz_pal, oben, option):
 
             nr = randint(0, len(row_opt) - 1)  # randint(0,5) zieht eine zufällige Zahl von 0 bis 5 (inkl. 0 und 5)
 
-            if (len(row_opt) == 6 or restr) and tabelle.loc[idx_pal:idx_pal + 6, 'h_i'].sum() >= 1:
+            if (len(row_opt) == 6 or restr) and tabelle.loc[idx_pal:idx_pal+5, 'h_i'].sum() >= 1: #(.loc[0:2] umfasst 0,1,2)
                 lkwplan.iloc[3:, col_d] = 'x'
 
             if lkwplan.iloc[row_opt[nr], col_d] != 'x':
@@ -1179,7 +1191,7 @@ for tour_idx in range(0,anzahl_touren):
                 if n_einzeln == 1:  # im ersten Durchlauf zunächst tabelle_alle erzeugen
                     tabelle_alle = pd.DataFrame(tabelle_n.copy(deep=True))
                 else:
-                    tabelle_alle = pd.concat([tabelle_alle, tabelle_n])
+                    tabelle_alle = pd.concat([tabelle_n, tabelle_alle])
 
             tabelle = tabelle_alle.reset_index(inplace=False, drop=True)
 
@@ -1198,7 +1210,7 @@ for tour_idx in range(0,anzahl_touren):
                 if n_einzeln == 1:  # im ersten Durchlauf zunächst tabelle_alle erzeugen
                     tabelle_alle = pd.DataFrame(tabelle_n.copy(deep=True))
                 else:
-                    tabelle_alle = pd.concat([tabelle_alle, tabelle_n])
+                    tabelle_alle = pd.concat([tabelle_n, tabelle_alle])
 
             tabelle = tabelle_alle.reset_index(inplace=False, drop=True)
 
