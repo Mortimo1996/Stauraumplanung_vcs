@@ -35,7 +35,7 @@ button2 = Button(window,text="Close",command=quit)
 button2.pack()
 
 bar['value'] = 0
-#percent.set('0 %')
+percent.set('Vorbereitung')
 window.update_idletasks()
 
 
@@ -83,14 +83,11 @@ for z_blk in blk_vor: #nicht in späteres identisches for integriert, weil ich d
         # dictionary füllen mit Blockauftragsnr.: [Auslieferungsreihenfolge, Kommission/Klima]
         blkblo_blktre_blkk02[z_blk[16:23]] = [z_blk[431:436], z_blk[281:282]]"""
         # blkblo_blktre_blkk02 dictionary füllen mit Blockauftragsnr.: [Tournr.-Usp als Platzhalter für späteres n, Kommission/Klima]
-        usp=z_blk[54:60].strip()
-        if usp=='0': # Usp 0 ist nichtssagend, hier Auslieferungsreihenfolge der Kundennr. nutzen
-            # auch hinter einer Kundennr. bei Usp 0 können mehrere Auslieferungsnr. stecken - wieder Minimum wählen
-            usp0_kunde='kd'+(z_blk[46:53].strip()) # Spalte Kunde in BLK
+        usp = z_blk[54:60].strip()
+        if usp == '0': # Usp 0 ist nichtssagend, hier Auslieferungsreihenfolge der Kundennr. nutzen
+            usp = 'kd'+(z_blk[46:53].strip()) # Spalte Kunde in BLK
             # Kennzeichnung kd benötigt, da es z. B. Kundennr. 5 gibt, die NICHT Umschlagspunkt 5 entspricht
-            blkblo_blktre_blkk02[z_blk[16:23]] = [(z_blk[426:431]+'-'+usp0_kunde), z_blk[281:282]]
-        else:
-            blkblo_blktre_blkk02[z_blk[16:23]] = [(z_blk[426:431]+'-'+usp), z_blk[281:282]]
+        blkblo_blktre_blkk02[z_blk[16:23]] = [(z_blk[426:431]+'-'+usp), z_blk[281:282]]
 
 
 tarnr_tarspd = {}
@@ -121,32 +118,28 @@ for z_tar in tar_vor:
                 blkblo_je_tour[idx]['Auftragsnr'].append(z_blk[16:23])  # Liste aller Blockauftragsnummern dieser Tour
                 blkblo_je_tour[idx]['Land'].append(z_blk[165:167])  # Liste aller Zielländer (der Umschlagspunkte) dieser Tour
 
-                usp=z_blk[54:60].strip()
-                if usp=='0': # Usp 0 ist nichtssagend, hier Auslieferungsreihenfolge der Kundennr. nutzen
-                    # auch hinter einer Kundennr. bei Usp 0 können mehrere Auslieferungsnr. stecken - wieder Minimum wählen
-                    usp0_kunde='kd'+(z_blk[46:53].strip()) # Spalte Kunde in BLK
+                usp = z_blk[54:60].strip()
+                if usp == '0': # Usp 0 ist nichtssagend, hier Auslieferungsreihenfolge der Kundennr. nutzen
+                    # auch hinter einer Kundennr. bei Usp 0 können mehrere Auslieferungsnr. stecken - später auch hier Min. wählen
+                    usp = 'kd'+(z_blk[46:53].strip()) # Spalte Kunde in BLK
                     # Kennzeichnung kd benötigt, da es z. B. Kundennr. 5 gibt, die NICHT Umschlagspunkt 5 entspricht
-                    if (z_blk[426:431]+'-'+usp0_kunde) not in usp_touren:
-                        usp_touren[(z_blk[426:431]+'-'+usp0_kunde)] = [int(z_blk[431:436].strip())]  # Auslieferungsreihenfolge, erstes Element zu diesem Usp
-                    else:
-                        usp_touren[(z_blk[426:431]+'-'+usp0_kunde)].append(int(z_blk[431:436].strip()))  # append Auslieferungsreihenfolge
 
-                elif (z_blk[426:431]+'-'+usp) not in usp_touren: # wird nur noch bei usp!='0' geprüft
+                if (z_blk[426:431]+'-'+usp) not in usp_touren:
                     usp_touren[(z_blk[426:431]+'-'+usp)] = [int(z_blk[431:436].strip())] # Auslieferungsreihenfolge, erstes Element zu diesem Usp
                 else:
                     usp_touren[(z_blk[426:431]+'-'+usp)].append(int(z_blk[431:436].strip())) # append Auslieferungsreihenfolge
 
         idx += 1
     zeilennr_tar += 1
-anzahl_touren=idx
+anzahl_touren = idx
 
 # haben jetzt das dict usp_touren mit allen Auslieferungsreihenfolgenummern zu jedem Umschlagspunkt jeder Tour
 # für jeden Umschlagspunkt nur noch das Minimum behalten
 for u in usp_touren:
-    usp_touren[u]=min(usp_touren[u])
+    usp_touren[u] = min(usp_touren[u])
 
 for b in blkblo_blktre_blkk02: # mit Auslieferungsreihenfolge des dazugehörigen Usps überschreiben
-    blkblo_blktre_blkk02[b][0]=usp_touren[blkblo_blktre_blkk02[b][0]]
+    blkblo_blktre_blkk02[b][0] = usp_touren[blkblo_blktre_blkk02[b][0]]
 
 
 paletten_je_tour = {}
@@ -229,6 +222,7 @@ def plan_fuellen(tabelle, lkwplan, anz_pal, oben, option):
         while idx_pal < anz_pal:
 
             if oben == 0:
+                oben = -1  # damit dieser Teil nicht nochmal durchlaufen werden muss
                 for row_c in range(3, 6):
                     for col_c in range(col_b, 11):
                         if lkwplan.iloc[row_c, col_c] == 'o':
@@ -242,7 +236,7 @@ def plan_fuellen(tabelle, lkwplan, anz_pal, oben, option):
                 # print('Keine Zuweisung ab Palette {} (d.h. ab Reihenindex {}) möglich.'.format(tabelle.loc[idx_pal,'i'],idx_pal))
                 break
 
-            if row_b == 0 and tabelle.loc[idx_pal:idx_pal + 6, 'h_i'].sum() >= 1:
+            if row_b == 0 and tabelle.loc[idx_pal:idx_pal+5, 'h_i'].sum() >= 1: #(.loc[0:2] umfasst 0,1,2)
                 lkwplan.iloc[3:, col_b] = 'x'
 
             if lkwplan.iloc[row_b, col_b] != 'x':
@@ -264,6 +258,7 @@ def plan_fuellen(tabelle, lkwplan, anz_pal, oben, option):
         while idx_pal < anz_pal:
 
             if oben == 0:
+                oben = -1  # damit dieser Teil nicht nochmal durchlaufen werden muss
                 for row_c in range(3, 6):
                     for col_c in range(col_a, 11):
                         if lkwplan.iloc[row_c, col_c] == 'o':
@@ -277,7 +272,7 @@ def plan_fuellen(tabelle, lkwplan, anz_pal, oben, option):
                 # print('Keine Zuweisung ab Palette {} (d.h. ab Reihenindex {}) möglich.'.format(tabelle.loc[idx_pal,'i'],idx_pal))
                 break
 
-            if row_idx == 0 and tabelle.loc[idx_pal:idx_pal + 6, 'h_i'].sum() >= 1:
+            if row_idx == 0 and tabelle.loc[idx_pal:idx_pal+5, 'h_i'].sum() >= 1: #(.loc[0:2] umfasst 0,1,2)
                 lkwplan.iloc[3:, col_a] = 'x'
 
             if lkwplan.iloc[rows[row_idx], col_a] != 'x':
@@ -293,12 +288,13 @@ def plan_fuellen(tabelle, lkwplan, anz_pal, oben, option):
     elif option == 3:  # nacheinander aufsteigend durch Spalten, dabei zufällige Zeilen
         col_d = 0
         idx_pal = 0
-        row_opt = [0, 1, 2, 3, 4, 5]
+        row_opt = ([0, 1 ,2] if anz_pal<=33 else [0, 1, 2, 3, 4, 5])
 
         while idx_pal < anz_pal:
             restr = False
 
             if oben == 0:
+                oben = -1  # damit dieser Teil nicht nochmal durchlaufen werden muss
                 for row_c in range(3, 6):
                     for col_c in range(col_d, 11):
                         if lkwplan.iloc[row_c, col_c] == 'o':
@@ -307,17 +303,26 @@ def plan_fuellen(tabelle, lkwplan, anz_pal, oben, option):
             if len(row_opt) == 0:
                 col_d += 1
 
-                if oben == 2 and anz_pal % 3 == 2:  # Optionen für Restreihe
+                if anz_pal < 33 and anz_pal % 3 == 2 and (anz_pal - idx_pal) == 2: # Optionen für Restreihe unten
+                    if randint(0, 1) == 0:
+                        row_opt = [0, 1]
+                    else:
+                        row_opt = [1, 2]
+                elif anz_pal < 33 and anz_pal % 3 == 1 and (anz_pal - idx_pal) == 1: # Optionen für Restreihe unten
+                    row_opt = [0, 2]
+
+                elif oben == 2 and anz_pal % 3 == 2:  # Optionen für Restreihe oben
                     restr = True
                     if randint(0, 1) == 0:
                         row_opt = [0, 1, 2, 4, 5]
                     else:
                         row_opt = [0, 1, 2, 3, 4]
-                elif oben == 1 and anz_pal % 3 == 1:  # Optionen für Restreihe
+                elif oben == 1 and anz_pal % 3 == 1:  # Optionen für Restreihe oben
                     restr = True
                     row_opt = [0, 1, 2, 3, 5]
+
                 else:  # alle anderen außer der Restreihe
-                    row_opt = [0, 1, 2, 3, 4, 5]
+                    row_opt = ([0, 1, 2] if anz_pal <= 33 else [0, 1, 2, 3, 4, 5])
 
             if col_d >= lkwplan.shape[1]:
                 # print('Keine Zuweisung ab Palette {} (d.h. ab Reihenindex {}) möglich.'.format(tabelle.loc[idx_pal,'i'],idx_pal))
@@ -325,7 +330,7 @@ def plan_fuellen(tabelle, lkwplan, anz_pal, oben, option):
 
             nr = randint(0, len(row_opt) - 1)  # randint(0,5) zieht eine zufällige Zahl von 0 bis 5 (inkl. 0 und 5)
 
-            if (len(row_opt) == 6 or restr) and tabelle.loc[idx_pal:idx_pal + 6, 'h_i'].sum() >= 1:
+            if (len(row_opt) == 6 or restr) and tabelle.loc[idx_pal:idx_pal+5, 'h_i'].sum() >= 1: #(.loc[0:2] umfasst 0,1,2)
                 lkwplan.iloc[3:, col_d] = 'x'
 
             if lkwplan.iloc[row_opt[nr], col_d] != 'x':
@@ -1052,11 +1057,12 @@ ______________________________________________________________________________
 # Zeilen der pss-Datei zur späteren Befüllung mitverfolgen
 gesamtzeilenliste=list(np.arange(len(pss_vor)))
 
+print('Vorbereitungen abgeschlossen')
 
 for tour_idx in range(0,anzahl_touren):
     time_tour = time.time()
 
-    percent.set(f'Tour {tour_idx+1}/{anzahl_touren}')
+    percent.set(f'     Tour {tour_idx+1}/{anzahl_touren}     ')
     window.update_idletasks()
 
 
@@ -1082,7 +1088,7 @@ for tour_idx in range(0,anzahl_touren):
 
 
         bar['value'] += 100 / anzahl_touren
-        percent.set(str((tour_idx + 1) / anzahl_touren * 100) + "%")
+        #percent.set(str((tour_idx + 1) / anzahl_touren * 100) + "%")
         window.update_idletasks()
         continue
 
@@ -1214,7 +1220,7 @@ for tour_idx in range(0,anzahl_touren):
                 if n_einzeln == 1:  # im ersten Durchlauf zunächst tabelle_alle erzeugen
                     tabelle_alle = pd.DataFrame(tabelle_n.copy(deep=True))
                 else:
-                    tabelle_alle = pd.concat([tabelle_alle, tabelle_n])
+                    tabelle_alle = pd.concat([tabelle_n, tabelle_alle])
 
             tabelle = tabelle_alle.reset_index(inplace=False, drop=True)
 
@@ -1233,7 +1239,7 @@ for tour_idx in range(0,anzahl_touren):
                 if n_einzeln == 1:  # im ersten Durchlauf zunächst tabelle_alle erzeugen
                     tabelle_alle = pd.DataFrame(tabelle_n.copy(deep=True))
                 else:
-                    tabelle_alle = pd.concat([tabelle_alle, tabelle_n])
+                    tabelle_alle = pd.concat([tabelle_n, tabelle_alle])
 
             tabelle = tabelle_alle.reset_index(inplace=False, drop=True)
 
@@ -1470,7 +1476,7 @@ new_tar.writelines(tar_vor)
 new_tar.close()
 
 
-percent.set("Verfahren abgeschlossen")
+percent.set('   Verfahren abgeschlossen   ')
 window.update_idletasks()
 
 print(f'Verfahrensdauer in Summe: {time.time()-starttime}')
