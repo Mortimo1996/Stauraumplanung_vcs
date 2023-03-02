@@ -25,7 +25,7 @@ progressbar = Progressbar(window, style="green.Horizontal.TProgressbar",
                           mode="determinate")
 progressbar.pack(pady=20)
 
-percentlabel = Label(window, textvariable=percent).pack()
+percentlabel = tk.Label(window,  bg="white", textvariable=percent).pack()
 button_Close = Button(window, text="Close", command=destroy)
 button_Close.place(x=170, y=80, width=100, height=30)
 
