@@ -429,8 +429,8 @@ def plan_bewertung(tabelle_, lkwplan_):
 
     # G idx4: Ladebalkenbelastung eingehalten (max. 2 t pro 3er-Reihe oben)
     # G idx5: Achslastvorgaben einhalten!
-    # = 22, wenn Ladungsschwerpunkt zu nah an der Stirnwand
-    # = 33, wenn Ladungsschwerpunkt zu nah an der Tür
+    # = 20, wenn Ladungsschwerpunkt zu nah an der Stirnwand + Abstand zum erlaubten Intervall
+    # = 30, wenn Ladungsschwerpunkt zu nah an der Tür + Abstand zum erlaubten Intervall
     # G idx6: Gewichtsdifferenz
 
     # --------------------------------------------------------------------------------------
@@ -451,9 +451,9 @@ def plan_bewertung(tabelle_, lkwplan_):
     ladungsschw = zaehler / sum(sp_sum)
 
     if lsp_u > ladungsschw:
-        bewertung[5] = 22+(lsp_u-ladungsschw)  # Ladungsschwerpunkt zu weit an der Stirnwand
+        bewertung[5] = 20+(lsp_u-ladungsschw)  # Ladungsschwerpunkt zu weit an der Stirnwand
     elif lsp_o < ladungsschw:
-        bewertung[5] = 33+(ladungsschw-lsp_o)  # Ladungsschwerpunkt zu weit an der Tür
+        bewertung[5] = 30+(ladungsschw-lsp_o)  # Ladungsschwerpunkt zu weit an der Tür
 
     # G idx6: Gewichtsdifferenz
     """gew_rechts=z_sum[0]+z_sum[3]
@@ -845,22 +845,18 @@ def tauschpartner_andere_reihe(lkwplan_, lkwplan_n_werte, lkwplan_bew, tabelle_2
         # bestimme Tauschkandidaten zur Achslastverbesserung
         for t in tauschpartner:
             if type(t[0]) == int:
-                if lkwplan_bew[5] == 22 and pal_col_idx > col_idx_neu or lkwplan_bew[
-                    5] == 33 and pal_col_idx < col_idx_neu:
+                if 20 <= lkwplan_bew[5] < 30 and pal_col_idx > col_idx_neu or lkwplan_bew[5] >= 30 and pal_col_idx < col_idx_neu:
                     if tabelle_2.loc[lkwplan_.iloc[t[0], t[1]], 'm_i'] > m_wert:
                         tauschpartner_achslast.append(t)
-                elif lkwplan_bew[5] == 22 and pal_col_idx < col_idx_neu or lkwplan_bew[
-                    5] == 33 and pal_col_idx > col_idx_neu:
+                elif 20 <= lkwplan_bew[5] < 30 and pal_col_idx < col_idx_neu or lkwplan_bew[5] >= 30 and pal_col_idx > col_idx_neu:
                     if tabelle_2.loc[lkwplan_.iloc[t[0], t[1]], 'm_i'] < m_wert:
                         tauschpartner_achslast.append(t)
 
             else:
-                if lkwplan_bew[5] == 22 and pal_col_idx > col_idx_neu or lkwplan_bew[
-                    5] == 33 and pal_col_idx < col_idx_neu:
+                if 20 <= lkwplan_bew[5] < 30 and pal_col_idx > col_idx_neu or lkwplan_bew[5] >= 30 and pal_col_idx < col_idx_neu:
                     if tabelle_2.loc[lkwplan_.iloc[t[1][0], t[1][1]], 'm_i'] > m_wert:
                         tauschpartner_achslast.append(t)
-                elif lkwplan_bew[5] == 22 and pal_col_idx < col_idx_neu or lkwplan_bew[
-                    5] == 33 and pal_col_idx > col_idx_neu:
+                elif 20 <= lkwplan_bew[5] < 30 and pal_col_idx < col_idx_neu or lkwplan_bew[5] >= 30 and pal_col_idx > col_idx_neu:
                     if tabelle_2.loc[lkwplan_.iloc[t[1][0], t[1][1]], 'm_i'] < m_wert:
                         tauschpartner_achslast.append(t)
 

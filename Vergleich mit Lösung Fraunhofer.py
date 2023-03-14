@@ -136,11 +136,9 @@ for z_tar in tar_vor:
         warnungen[idx] = []
         fazit[idx] = ' '
 
-        if (vorgaben_spediteure.loc[:, 'Spediteur'] == z_tar[
-                                                       53:63].strip()).any():  # wenn es den Spediteur aus tar in unseren Spediteursvorgaben gibt
+        if (vorgaben_spediteure.loc[:, 'Spediteur'] == z_tar[53:63].strip()).any():  # wenn es den Spediteur aus tar in unseren Spediteursvorgaben gibt
             # starte Index von TARNR erst bei 18 statt 16, da Nr. in blk nur fünfstellig
-            tarnr_tarspd[idx] = [z_tar[18:23], z_tar[53:63].strip(),
-                                 zeilennr_tar]  # erzeugt dict {idx: [Tournr., Spediteur, Zeile]}
+            tarnr_tarspd[idx] = [z_tar[18:23], z_tar[53:63].strip(), zeilennr_tar]  # erzeugt dict {idx: [Tournr., Spediteur, Zeile]}
         else:  # ansonsten wähle als Vorgaben hier den Defaultwert Andere
             tarnr_tarspd[idx] = [z_tar[18:23], 'Andere', zeilennr_tar]
 
@@ -152,8 +150,7 @@ for z_tar in tar_vor:
         for z_blk in blk_vor:
             if z_blk[426:431] == z_tar[18:23]:  # gleiche Tournr.
                 blkblo_je_tour[idx]['Auftragsnr'].append(z_blk[16:23])  # Liste aller Blockauftragsnummern dieser Tour
-                blkblo_je_tour[idx]['Land'].append(
-                    z_blk[165:167])  # Liste aller Zielländer (der Umschlagspunkte) dieser Tour
+                blkblo_je_tour[idx]['Land'].append(z_blk[165:167])  # Liste aller Zielländer (der Umschlagspunkte) dieser Tour
 
                 usp = z_blk[54:60].strip()
                 if usp == '0':  # Usp 0 ist nichtssagend, hier Auslieferungsreihenfolge der Kundennr. nutzen
@@ -162,11 +159,9 @@ for z_tar in tar_vor:
                     # Kennzeichnung kd benötigt, da es z. B. Kundennr. 5 gibt, die NICHT Umschlagspunkt 5 entspricht
 
                 if (z_blk[426:431] + '-' + usp) not in usp_touren:
-                    usp_touren[(z_blk[426:431] + '-' + usp)] = [
-                        int(z_blk[431:436].strip())]  # Auslieferungsreihenfolge, erstes Element zu diesem Usp
+                    usp_touren[(z_blk[426:431] + '-' + usp)] = [int(z_blk[431:436].strip())]  # Auslieferungsreihenfolge, erstes Element zu diesem Usp
                 else:
-                    usp_touren[(z_blk[426:431] + '-' + usp)].append(
-                        int(z_blk[431:436].strip()))  # append Auslieferungsreihenfolge
+                    usp_touren[(z_blk[426:431] + '-' + usp)].append(int(z_blk[431:436].strip()))  # append Auslieferungsreihenfolge
 
         idx += 1
     zeilennr_tar += 1
@@ -369,8 +364,8 @@ def plan_bewertung(tabelle_, lkwplan_):
 
     # G idx4: Ladebalkenbelastung eingehalten (max. 2 t pro 3er-Reihe oben)
     # G idx5: Achslastvorgaben einhalten!
-    # = 22, wenn Ladungsschwerpunkt zu nah an der Stirnwand
-    # = 33, wenn Ladungsschwerpunkt zu nah an der Tür
+    # = 20, wenn Ladungsschwerpunkt zu nah an der Stirnwand + Abstand zum erlaubten Intervall
+    # = 30, wenn Ladungsschwerpunkt zu nah an der Tür + Abstand zum erlaubten Intervall
     # G idx6: Gewichtsdifferenz
 
     # --------------------------------------------------------------------------------------
@@ -391,9 +386,9 @@ def plan_bewertung(tabelle_, lkwplan_):
     ladungsschw = zaehler / sum(sp_sum)
 
     if lsp_u > ladungsschw:
-        bewertung[5] = 22 + (lsp_u - ladungsschw)  # Ladungsschwerpunkt zu weit an der Stirnwand
+        bewertung[5] = 20 + (lsp_u - ladungsschw)  # Ladungsschwerpunkt zu weit an der Stirnwand
     elif lsp_o < ladungsschw:
-        bewertung[5] = 33 + (ladungsschw - lsp_o)  # Ladungsschwerpunkt zu weit an der Tür
+        bewertung[5] = 30 + (ladungsschw - lsp_o)  # Ladungsschwerpunkt zu weit an der Tür
 
     # G idx6: Gewichtsdifferenz
     """gew_rechts=z_sum[0]+z_sum[3]
