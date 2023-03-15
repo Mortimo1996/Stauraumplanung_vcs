@@ -81,35 +81,35 @@ pfad_vorgabenspediteure='C:/Users/laras/Downloads/Fahrzeugdefinitionen.csv'
 pfad_laendervorgaben='C:/Users/laras/Downloads/Laendervorgaben.csv'
 
 #tar_pfad='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten 2017/20171115_1nach/tar.asc'
-tar_pfad='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten August 2022/Daten vor Stauraumplanung/tar.asc'
+#tar_pfad='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten August 2022/Daten vor Stauraumplanung/tar.asc'
 #tar_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten November 2022/Daten vor Stauraumplanung/tar.asc'
-#tar_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Daten_NEU_20230218/Vorstauraum/15022023/tar.asc'
+tar_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Daten_NEU_20230218/Vorstauraum/15022023/tar.asc'
 #tar_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Daten_NEU_20230218/Vorstauraum/16022023/tar.asc'
 #tar_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Daten_NEU_20230218/Vorstauraum/17022023/tar.asc'
 
 #blk_pfad='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten 2017/20171115_1nach/blk.asc'
-blk_pfad='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten August 2022/Daten vor Stauraumplanung/blk.asc'
+#blk_pfad='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten August 2022/Daten vor Stauraumplanung/blk.asc'
 #blk_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten November 2022/Daten vor Stauraumplanung/blk.asc'
-#blk_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Daten_NEU_20230218/Vorstauraum/15022023/blk.asc'
+blk_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Daten_NEU_20230218/Vorstauraum/15022023/blk.asc'
 #blk_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Daten_NEU_20230218/Vorstauraum/16022023/blk.asc'
 #blk_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Daten_NEU_20230218/Vorstauraum/17022023/blk.asc'
 
 #pss_pfad='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten 2017/20171115_1nach/pss.asc'
-pss_pfad='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten August 2022/Daten vor Stauraumplanung/pss.asc'
+#pss_pfad='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten August 2022/Daten vor Stauraumplanung/pss.asc'
 #pss_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten November 2022/Daten vor Stauraumplanung/pss.asc'
-#pss_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Daten_NEU_20230218/Vorstauraum/15022023/pss.asc'
+pss_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Daten_NEU_20230218/Vorstauraum/15022023/pss.asc'
 #pss_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Daten_NEU_20230218/Vorstauraum/16022023/pss.asc'
 #pss_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Daten_NEU_20230218/Vorstauraum/17022023/pss.asc'
 
-tar_pfad_unsere_lsg='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten August 2022/Daten nach_eigene Lösung/tar.asc'
+#tar_pfad_unsere_lsg='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten August 2022/Daten nach_eigene Lösung/tar.asc'
 #tar_pfad_unsere_lsg='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten November 2022/Daten nach_eigene Lösung/tar.asc'
-#tar_pfad_unsere_lsg='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Daten_NEU_20230218/WIR/15022023/tar.asc'
+tar_pfad_unsere_lsg='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Daten_NEU_20230218/WIR/15022023/tar.asc'
 #tar_pfad_unsere_lsg='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Daten_NEU_20230218/WIR/16022023/tar.asc'
 #tar_pfad_unsere_lsg='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Daten_NEU_20230218/WIR/17022023/tar.asc'
 
-pss_pfad_unsere_lsg='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten August 2022/Daten nach_eigene Lösung/pss.asc'
+#pss_pfad_unsere_lsg='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten August 2022/Daten nach_eigene Lösung/pss.asc'
 #pss_pfad_unsere_lsg='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten November 2022/Daten nach_eigene Lösung/pss.asc'
-#pss_pfad_unsere_lsg='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Daten_NEU_20230218/WIR/15022023/pss.asc'
+pss_pfad_unsere_lsg='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Daten_NEU_20230218/WIR/15022023/pss.asc'
 #pss_pfad_unsere_lsg='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Daten_NEU_20230218/WIR/16022023/pss.asc'
 #pss_pfad_unsere_lsg='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Daten_NEU_20230218/WIR/17022023/pss.asc'
 
@@ -1238,16 +1238,16 @@ for tour_idx in range(0, anzahl_touren):
                  'F': {'by': ['n_i', 't_i', 'h_i'], 'ascending': [False, True, False]},
                  'G': {'by': ['n_i', 't_i', 'h_i'], 'ascending': [False, True, True]},
                  'H': {'by': ['n_i', 'h_i'], 'ascending': [False, True]},
-                 'H2': {'by': ['n_i', 'h_i'], 'ascending': [False, True]},
-                 'I': {'by': ['n_i', 'h_i'], 'ascending': [False, False]},
-                 'I2': {'by': ['n_i', 'h_i'], 'ascending': [False, False]},
-                 'J': {'by': ['n_i', 'h_i', 'm_i'], 'ascending': [False, True, True]},
-                 'K': {'by': ['n_i', 'h_i', 'm_i'], 'ascending': [False, True, False]},
-                 'L': {'by': ['n_i', 'h_i', 'm_i'], 'ascending': [False, False, True]},
-                 'M': {'by': ['n_i', 'h_i', 'm_i'], 'ascending': [False, False, False]},
-                 'N': {'by': ['n_i'], 'ascending': [False]},
-                 'O': {'by': ['n_i'], 'ascending': [False]},
+                 'I': {'by': ['n_i', 'h_i'], 'ascending': [False, True]},
+                 'J': {'by': ['n_i', 'h_i'], 'ascending': [False, False]},
+                 'K': {'by': ['n_i', 'h_i'], 'ascending': [False, False]},
+                 'L': {'by': ['n_i', 'h_i', 'm_i'], 'ascending': [False, True, True]},
+                 'M': {'by': ['n_i', 'h_i', 'm_i'], 'ascending': [False, True, False]},
+                 'N': {'by': ['n_i', 'h_i', 'm_i'], 'ascending': [False, False, True]},
+                 'O': {'by': ['n_i', 'h_i', 'm_i'], 'ascending': [False, False, False]},
                  'P': {'by': ['n_i'], 'ascending': [False]},
+                 'Q': {'by': ['n_i'], 'ascending': [False]},
+                 'R': {'by': ['n_i'], 'ascending': [False]},
                  'S1': {'by': 'x'},
                  'S2': {'by': 'x'},
                  'S3': {'by': 'x'},
@@ -1354,14 +1354,14 @@ for tour_idx in range(0, anzahl_touren):
             if zweioptionen:
                 plaene[-2][0] = plan_fuellen(tabelle, plaene[-2][0], anz_pal, oben, planoption)
                 plaene[-2][1] = plan_bewertung(tabelle, plaene[-2][0])
-                if (sum(plaene[-2][1][0:6]) <= 0.001 and plaene[-2][1][-1] <= diff_optimal_ab):
+                """if (sum(plaene[-2][1][0:6]) <= 0.001 and plaene[-2][1][-1] <= diff_optimal_ab):
                     # break bricht nur die innere "while planoption<=4"-Schleife ab
                     break
 
             if (sum(plaene[-1][1][0:6]) <= 0.001 and plaene[-1][1][-1] <= diff_optimal_ab):
                 # Sortierung dieses ifs nach if zweioptionen gewählt, um beide Optionen noch mitzunehmen
                 # break bricht nur die innere "while planoption<=4"-Schleife ab
-                break
+                break"""
 
             # print('\nVariante',var,'Planoption',planoption,'\n',plaene[-1],'\n',plaene[-2],'\n\n')
 
@@ -1465,7 +1465,7 @@ for tour_idx in range(0, anzahl_touren):
     else:
         fazit[tour_idx] = f'Keine zulässige Lösung gefunden. Die beste bisherige Lösung hat folgende Bewertung: {plan_final_bew}'
         if plan_final_bew[0]>0:
-            fazit_gui.append(f'Tour {tour_idx}: {plan_final_bew[0]} Paletten konnten nicht eingeplant werden. Bitte prüfen!')
+            fazit_gui.append(f'Tour {tour_idx}: {plan_final_bew[0]} Paletten konnten nicht eingeplant werden')
 
     # Überschreiben der pss-Datei vorbereiten
     # Befüllen bei Spediteur "Andere" läuft oben im Code separat
@@ -1564,10 +1564,15 @@ for tour_idx in range(0, anzahl_touren):
         print(fazit[tour_idx])
 
     print(' ')
-if fazit_gui != ' ':
+
+
+
+if len(fazit_gui)>0:
     window.geometry("400x180")
-    percent.set(f'Es konnte inssgesamt {len(gesamtzeilenliste)} Paletten nicht eingeplant werden.\nBitte folgende Touren prüfen!\nTouren: {fazit_gui}')
-# print(f'Benötigte Gesamtzeit: {time.time()-starttime}') - weiter oben passender, da hier abhängig von "Close" des Fensters
-window.mainloop()
+    percent.set(f'Es traten folgende Probleme auf:\n{fazit_gui}\nBitte prüfen!')
+    window.update_idletasks()
+
 
 # print(f'Benötigte Gesamtzeit: {time.time()-starttime}') - weiter oben passender, da hier abhängig von "Close" des Fensters
+
+window.mainloop()
