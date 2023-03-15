@@ -386,9 +386,9 @@ def plan_bewertung(tabelle_, lkwplan_):
     ladungsschw = zaehler / sum(sp_sum)
 
     if lsp_u > ladungsschw:
-        bewertung[5] = 20 + (lsp_u - ladungsschw)  # Ladungsschwerpunkt zu weit an der Stirnwand
+        bewertung[5] = 20 + round(lsp_u - ladungsschw, 4)  # Ladungsschwerpunkt zu weit an der Stirnwand
     elif lsp_o < ladungsschw:
-        bewertung[5] = 30 + (ladungsschw - lsp_o)  # Ladungsschwerpunkt zu weit an der Tür
+        bewertung[5] = 30 + round(ladungsschw - lsp_o, 4)  # Ladungsschwerpunkt zu weit an der Tür
 
     # G idx6: Gewichtsdifferenz
     """gew_rechts=z_sum[0]+z_sum[3]
@@ -401,7 +401,7 @@ def plan_bewertung(tabelle_, lkwplan_):
     gew_links = z_sum[2] + z_sum[5]
 
     prozent_links = (gew_links + gew_mitte / 2) / sum(z_sum) * 100
-    bewertung[6] = abs(50 - prozent_links) * 2
+    bewertung[6] = round(abs(50 - prozent_links) * 2, 4)
 
     # --------------------------------------------------------------------------------------
     # für die R-Teile (räumlich):
@@ -434,6 +434,7 @@ def plan_bewertung(tabelle_, lkwplan_):
                 # wäre auch immer verletzt, wenn HPal selbst oben steht
                 # ...dafür rechnen wir aber bereits +1, deshalb hier elif: greift nur, wenn HPal unten steht
                 bewertung[1] += 1
+    bewertung[1] = round(bewertung[1], 2)
 
     # R idx2: kühl-trocken-Trennung auch nach Austausch berücksichtigt
     kuehlpaletten = tabelle_.loc[tabelle_['t_i'] > 0].reset_index(inplace=False, drop=True)
@@ -461,6 +462,7 @@ def plan_bewertung(tabelle_, lkwplan_):
                 if tpal_fehler:
                     bewertung[
                         2] += 1  # für jede Kühlpal um 1 hochzählen, bei der die n bzw. t der nächsthöheren Reihe nicht passen
+    bewertung[2] = round(bewertung[2], 2)
 
     # R idx3: Anz zusätzl benötigter Ladungssicherung durch ganz freie Reihen mittendrin
 
@@ -534,7 +536,8 @@ def plan_bewertung(tabelle_, lkwplan_):
                 # tabelle_.loc[tabelle_['i+h']==lkwplan_.iloc[row, col]]['n_i']
             else:
                 lkwplan_n_werte.iloc[row, col] = 'x'  # setze zur Vereinfachung auch mögliche 'o' auf 'x'
-    print(lkwplan_n_werte)
+
+    print('Auslieferungsnummern:\n', lkwplan_n_werte)
 
     for c in range(2, 12):
         c_vorher = lkwplan_n_werte.loc[:, str(c - 1)]  # .values.tolist()
@@ -545,7 +548,9 @@ def plan_bewertung(tabelle_, lkwplan_):
 
         if max(element for element in c_aktuell if element != 'x') > min(
                 element for element in c_vorher if element != 'x'):
-            print(f'Verstoß Auslieferungsreihenfolge: Nummer in Reihe {c - 1} kleiner als in Reihe {c}')
+            if n_verstoesse == 0:
+                print('Auslieferungsreihenfolge verletzt:')
+            print(f'\tNummer in Reihe {c - 1} kleiner als in Reihe {c}')
             n_verstoesse += 1
 
     bewertung[7] = n_verstoesse
