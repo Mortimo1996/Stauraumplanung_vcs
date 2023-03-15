@@ -1561,20 +1561,11 @@ new_tar.writelines(tar_vor)
 new_tar.close()
 
 percent.set('   Verfahren abgeschlossen   ')
-window.update_idletasks()
 
 print(f'Verfahrensdauer in Summe: {time.time() - starttime}')
 
 window.mainloop()
 
-
-"""
-______________________________________________________________________________
-
-Alle Touren durchlaufen
-Feedback an den Benutzer ausgeben (-> GUI)
-______________________________________________________________________________
-"""
 
 print('\n')
 for tour_idx in range(0, anzahl_touren):
@@ -1594,4 +1585,8 @@ for tour_idx in range(0, anzahl_touren):
 
     print(' ')
 
+if fazit_gui != ' ':
+    window.geometry("400x180")
+    percent.set(f'Es konnte inssgesamt {len(gesamtzeilenliste)} Paletten nicht eingeplant werden.\nBitte folgende Touren prüfen!\nTouren: {fazit_gui}')
 # print(f'Benötigte Gesamtzeit: {time.time()-starttime}') - weiter oben passender, da hier abhängig von "Close" des Fensters
+window.mainloop()
