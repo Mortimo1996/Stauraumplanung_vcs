@@ -1116,6 +1116,8 @@ jetzt kann über die Touren iteriert und Lösungen gefunden werden
 ______________________________________________________________________________
 """
 
+fazit_gui=[]
+
 # Zeilen der pss-Datei zur späteren Befüllung mitverfolgen
 gesamtzeilenliste = list(np.arange(len(pss_vor)))
 
@@ -1462,6 +1464,8 @@ for tour_idx in range(0, anzahl_touren):
 
     else:
         fazit[tour_idx] = f'Keine zulässige Lösung gefunden. Die beste bisherige Lösung hat folgende Bewertung: {plan_final_bew}'
+        if plan_final_bew[0]>0:
+            fazit_gui.append(f'Tour {tour_idx}: {plan_final_bew[0]} Paletten konnten nicht eingeplant werden. Bitte prüfen!')
 
     # Überschreiben der pss-Datei vorbereiten
     # Befüllen bei Spediteur "Andere" läuft oben im Code separat
