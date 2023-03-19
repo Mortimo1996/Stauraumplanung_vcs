@@ -1465,9 +1465,9 @@ for tour_idx in range(0, anzahl_touren):
     else:
         fazit[tour_idx] = f'Keine zulässige Lösung gefunden. Die beste bisherige Lösung hat folgende Bewertung: {plan_final_bew}'
         if plan_final_bew[0]>1:
-            fazit_gui.append(f'Tour {tour_idx}:   {plan_final_bew[0]} Paletten konnten nicht eingeplant werden\n')
+            fazit_gui.append(f'Tour {tour_idx}:   {plan_final_bew[0]} Paletten konnten nicht eingeplant werden')
         elif plan_final_bew[0]>0:
-            fazit_gui.append(f'Tour {tour_idx}:   {plan_final_bew[0]} Palette konnte nicht eingeplant werden\n')
+            fazit_gui.append(f'Tour {tour_idx}:   {plan_final_bew[0]} Palette konnte nicht eingeplant werden')
 
     # Überschreiben der pss-Datei vorbereiten
     # Befüllen bei Spediteur "Andere" läuft oben im Code separat
@@ -1569,18 +1569,14 @@ for tour_idx in range(0, anzahl_touren):
 
 
 if len(fazit_gui)>0:
-    window.geometry("400x260")
+    label = Label(window, text = 'Es traten folgende Probleme auf:\n').pack()
 
-    Label(window, text='\nEs traten folgende Probleme auf:\n').pack()
-    for f in fazit_gui:
-        Label(window, text=f).pack()
-    Label(window, text='Bitte prüfen!').pack()
-
-    """t=Text(window)
-    for f in fazit_gui:
-        t.insert(END,f+'\n')
-    t.pack()"""
-
+    for i in range(len(fazit_gui)):
+        label = Label(window, text = fazit_gui[i]).pack()
+    label = Label(window, text='\nBitte prüfen!\n').pack()
+    window.update_idletasks()
+    window.geometry('{}x{}'.format(window.winfo_reqwidth(), window.winfo_reqheight()))
 window.mainloop()
+
 
 # print(f'Benötigte Gesamtzeit: {time.time()-starttime}') - weiter oben passender, da hier abhängig von "Close" des Fensters
