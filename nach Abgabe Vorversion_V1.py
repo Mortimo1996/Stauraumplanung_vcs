@@ -84,34 +84,34 @@ pfad_laendervorgaben='C:/Users/laras/Downloads/Laendervorgaben.csv'
 #tar_pfad='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten August 2022/Daten vor Stauraumplanung/tar.asc'
 #tar_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten November 2022/Daten vor Stauraumplanung/tar.asc'
 #tar_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Daten_NEU_20230218/Vorstauraum/15022023/tar.asc'
-tar_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Daten_NEU_20230218/Vorstauraum/16022023/tar.asc'
-#tar_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Daten_NEU_20230218/Vorstauraum/17022023/tar.asc'
+#tar_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Daten_NEU_20230218/Vorstauraum/16022023/tar.asc'
+tar_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Daten_NEU_20230218/Vorstauraum/17022023/tar.asc'
 
 #blk_pfad='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten 2017/20171115_1nach/blk.asc'
 #blk_pfad='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten August 2022/Daten vor Stauraumplanung/blk.asc'
 #blk_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten November 2022/Daten vor Stauraumplanung/blk.asc'
 #blk_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Daten_NEU_20230218/Vorstauraum/15022023/blk.asc'
-blk_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Daten_NEU_20230218/Vorstauraum/16022023/blk.asc'
-#blk_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Daten_NEU_20230218/Vorstauraum/17022023/blk.asc'
+#blk_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Daten_NEU_20230218/Vorstauraum/16022023/blk.asc'
+blk_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Daten_NEU_20230218/Vorstauraum/17022023/blk.asc'
 
 #pss_pfad='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten 2017/20171115_1nach/pss.asc'
 #pss_pfad='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten August 2022/Daten vor Stauraumplanung/pss.asc'
 #pss_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten November 2022/Daten vor Stauraumplanung/pss.asc'
 #pss_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Daten_NEU_20230218/Vorstauraum/15022023/pss.asc'
-pss_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Daten_NEU_20230218/Vorstauraum/16022023/pss.asc'
-#pss_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Daten_NEU_20230218/Vorstauraum/17022023/pss.asc'
+#pss_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Daten_NEU_20230218/Vorstauraum/16022023/pss.asc'
+pss_pfad = 'C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Daten_NEU_20230218/Vorstauraum/17022023/pss.asc'
 
 #tar_pfad_unsere_lsg='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten August 2022/Daten nach_eigene Lösung/tar.asc'
 #tar_pfad_unsere_lsg='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten November 2022/Daten nach_eigene Lösung/tar.asc'
 #tar_pfad_unsere_lsg='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Daten_NEU_20230218/WIR/15022023/tar.asc'
-tar_pfad_unsere_lsg='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Daten_NEU_20230218/WIR/16022023/tar.asc'
-#tar_pfad_unsere_lsg='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Daten_NEU_20230218/WIR/17022023/tar.asc'
+#tar_pfad_unsere_lsg='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Daten_NEU_20230218/WIR/16022023/tar.asc'
+tar_pfad_unsere_lsg='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Daten_NEU_20230218/WIR/17022023/tar.asc'
 
 #pss_pfad_unsere_lsg='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten August 2022/Daten nach_eigene Lösung/pss.asc'
 #pss_pfad_unsere_lsg='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Testdaten November 2022/Daten nach_eigene Lösung/pss.asc'
 #pss_pfad_unsere_lsg='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Daten_NEU_20230218/WIR/15022023/pss.asc'
-pss_pfad_unsere_lsg='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Daten_NEU_20230218/WIR/16022023/pss.asc'
-#pss_pfad_unsere_lsg='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Daten_NEU_20230218/WIR/17022023/pss.asc'
+#pss_pfad_unsere_lsg='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Daten_NEU_20230218/WIR/16022023/pss.asc'
+pss_pfad_unsere_lsg='C:/Users/laras/Documents/Master WiSe 2021/04 Vorlesungen/IT-Studienprojekt/Rohdaten/Daten_NEU_20230218/WIR/17022023/pss.asc'
 
 
 """
@@ -1057,18 +1057,25 @@ def planauswahl_final(tabelle, planliste, planliste_v2, planliste_v3, diff_optim
                     return pl[0], pl[1]
 
                 elif pl[1][0] < bester_plan_bew[0]:  # mehr Paletten mitnehmen können ist immer besser (wenn notw. Kriterien erfüllt sind)
-                    if pl[1][1] <= bester_plan_bew[1] and pl[1][4] <= bester_plan_bew[4] and pl[1][5] <= \
+                    if math.floor(pl[1][1]) <= math.floor(bester_plan_bew[1]) and pl[1][4] <= bester_plan_bew[4] and pl[1][5] <= \
                             bester_plan_bew[5]:
                         verbessert = True
 
                 elif pl[1][0] == bester_plan_bew[0]:
-                    if pl[1][1] <= bester_plan_bew[1] and pl[1][4] <= bester_plan_bew[4] and pl[1][5] <= \
+                    if math.floor(pl[1][1]) <= math.floor(bester_plan_bew[1]) and pl[1][4] <= bester_plan_bew[4] and pl[1][5] <= \
                             bester_plan_bew[5]:
-                        if pl[1][1] < bester_plan_bew[1] or pl[1][4] < bester_plan_bew[4] or pl[1][5] < bester_plan_bew[5]:
+                        if math.floor(pl[1][1]) < math.floor(bester_plan_bew[1]) or pl[1][4] < bester_plan_bew[4] or pl[1][5] < bester_plan_bew[5]:
                             verbessert = True
                         elif sum(pl[1][2:4]) < sum(bester_plan_bew[2:4]):  # kühl-trocken + Ladungssicherung oben
                             verbessert = True
                         elif sum(pl[1][2:4]) == sum(bester_plan_bew[2:4]) and pl[1][6] < bester_plan_bew[6]:  # Gewichtsdiff. verkleinert
+                            verbessert = True
+
+                elif pl[1][0] > bester_plan_bew[0]:
+                    # wenn mehr Paletten fehlen, kann es trotzdem eine Verbesserung sein, wenn:
+                    # pl[1][0] die notwendigen idx1+idx4+idx5 erfüllt UND bisheriger bester Plan das NICHT tut
+                    if math.floor(bester_plan_bew[1])+bester_plan_bew[4]+bester_plan_bew[5] != 0:
+                        if math.floor(pl[1][1])+pl[1][4]+pl[1][5] == 0:
                             verbessert = True
 
                 if verbessert:
@@ -1089,19 +1096,26 @@ def planauswahl_final(tabelle, planliste, planliste_v2, planliste_v3, diff_optim
             return bester_pl_v2, bester_pl_v2_bew
 
         elif bester_pl_v2_bew[0] < bester_plan_bew[0]:  # mehr Paletten mitnehmen können ist immer besser (wenn notw. Kriterien erfüllt sind)
-            if bester_pl_v2_bew[1] <= bester_plan_bew[1] and bester_pl_v2_bew[4] <= bester_plan_bew[4] and \
+            if math.floor(bester_pl_v2_bew[1]) <= math.floor(bester_plan_bew[1]) and bester_pl_v2_bew[4] <= bester_plan_bew[4] and \
                     bester_pl_v2_bew[5] <= bester_plan_bew[5]:
                 verbessert = True
 
         elif bester_pl_v2_bew[0] == bester_plan_bew[0]:
-            if bester_pl_v2_bew[1] <= bester_plan_bew[1] and bester_pl_v2_bew[4] <= bester_plan_bew[4] and \
+            if math.floor(bester_pl_v2_bew[1]) <= math.floor(bester_plan_bew[1]) and bester_pl_v2_bew[4] <= bester_plan_bew[4] and \
                     bester_pl_v2_bew[5] <= bester_plan_bew[5]:
-                if bester_pl_v2_bew[1] < bester_plan_bew[1] or bester_pl_v2_bew[4] < bester_plan_bew[4] or \
+                if math.floor(bester_pl_v2_bew[1]) < math.floor(bester_plan_bew[1]) or bester_pl_v2_bew[4] < bester_plan_bew[4] or \
                         bester_pl_v2_bew[5] < bester_plan_bew[5]:
                     verbessert = True
                 elif sum(bester_pl_v2_bew[2:4]) < sum(bester_plan_bew[2:4]):  # kühl-trocken + Ladungssicherung oben
                     verbessert = True
                 elif sum(bester_pl_v2_bew[2:4]) == sum(bester_plan_bew[2:4]) and bester_pl_v2_bew[6] < bester_plan_bew[6]:  # Gewichtsdiff. verkleinert
+                    verbessert = True
+
+        elif bester_pl_v2_bew[0] > bester_plan_bew[0]:
+            # wenn mehr Paletten fehlen, kann es trotzdem eine Verbesserung sein, wenn:
+            # pl[1][0] die notwendigen idx1+idx4+idx5 erfüllt UND bisheriger bester Plan das NICHT tut
+            if math.floor(bester_plan_bew[1]) + bester_plan_bew[4] + bester_plan_bew[5] != 0:
+                if math.floor(bester_pl_v2_bew[1]) + bester_pl_v2_bew[4] + bester_pl_v2_bew[5] == 0:
                     verbessert = True
 
         if verbessert:
