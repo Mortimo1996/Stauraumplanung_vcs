@@ -1042,20 +1042,21 @@ def planauswahl_final(tabelle, planliste, planliste_v2, planliste_v3, diff_optim
             if sum(pl[1][0:6]) <= 0.001 and pl[1][-1] <= diff_optimal_ab:
                 return pl[0], pl[1]
             else:
-                if pl[1][0] > 0 and pl[1][0] >= planliste[0][1][0]:
+                if pl[1][0] > 0 and pl[1][0] <= planliste[0][1][0]:
                     # dann gibt es eine Lsg mit akzeptabler Bewertung, weil plaene_pal_ueber extra so sortiert
-                    # hier sparen wir uns ansonsten aufwändige Wiederholungen für Achslastverbesserungen
-                    pl[0], pl[1] = planverb_zufaellig(tabelle, pl[0], pl[1], max_tausche, 0)  # beinhaltet auch gewichte_optimieren
-                else:
-                    pl[0], pl[1] = planverb_zufaellig(tabelle, pl[0], pl[1], max_tausche, max_tausche_achslast)  # beinhaltet auch gewichte_optimieren
+                    if pl[1][5] == 0:
+                        # nur Achslastverbesserungen, wenn Kriterium überhaupt verletzt
+                        # hier sparen wir uns ansonsten aufwändige Wiederholungen für Achslastverbesserungen
+                        pl[0], pl[1] = planverb_zufaellig(tabelle, pl[0], pl[1], max_tausche, 0)  # beinhaltet auch gewichte_optimieren
+                    else:
+                        pl[0], pl[1] = planverb_zufaellig(tabelle, pl[0], pl[1], max_tausche, max_tausche_achslast)  # beinhaltet auch gewichte_optimieren
 
                 # verschiedenste Pläne miteinander vergleichen - idx0 & idx3 können sich jetzt also auch ändern
                 verbessert = False
                 if sum(pl[1][0:6]) <= 0.001 and pl[1][-1] <= diff_optimal_ab:
                     return pl[0], pl[1]
 
-                elif pl[1][0] < bester_plan_bew[
-                    0]:  # mehr Paletten mitnehmen können ist immer besser (wenn notw. Kriterien erfüllt sind)
+                elif pl[1][0] < bester_plan_bew[0]:  # mehr Paletten mitnehmen können ist immer besser (wenn notw. Kriterien erfüllt sind)
                     if pl[1][1] <= bester_plan_bew[1] and pl[1][4] <= bester_plan_bew[4] and pl[1][5] <= \
                             bester_plan_bew[5]:
                         verbessert = True
