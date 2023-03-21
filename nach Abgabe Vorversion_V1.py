@@ -1042,8 +1042,8 @@ def planauswahl_final(tabelle, planliste, planliste_v2, planliste_v3, diff_optim
             if sum(pl[1][0:6]) <= 0.001 and pl[1][-1] <= diff_optimal_ab:
                 return pl[0], pl[1]
             else:
-                if pl[1][0] > 0 and pl[1][0] <= planliste[0][1][0]:
-                    # dann gibt es eine Lsg mit akzeptabler Bewertung, weil plaene_pal_ueber extra so sortiert
+                if pl[1][0] <= planliste[0][1][0]:
+                    # ansonsten gibt es eine bessere (mehr Paletten) Lsg mit akzeptabler Bewertung, weil plaene_pal_ueber extra so sortiert
                     if pl[1][5] == 0:
                         # nur Achslastverbesserungen, wenn Kriterium überhaupt verletzt
                         # hier sparen wir uns ansonsten aufwändige Wiederholungen für Achslastverbesserungen
