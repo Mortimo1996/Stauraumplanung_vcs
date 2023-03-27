@@ -1440,8 +1440,10 @@ for tour_idx in range(0, anzahl_touren):
         # und dann mit den nächsten Zeilen alle anderen Pläne mit noch mehr fehlenden Paletten direkt aussortiere
         plaene_ueber_neu = [plaene_pal_ueber[0]]
         for p in range(1, len(plaene_pal_ueber)):
-            if plaene_pal_ueber[p][1][0] <= plaene_pal_ueber[0][1][0]:  # wenn die Anzahl nicht mitnehmbarer Paletten der der akzeptablen Lsg. entspricht
+            if plaene_pal_ueber[p][1][0] <= plaene_pal_ueber[0][1][0]:  # wenn die Anzahl nicht mitnehmbarer Paletten maximal der der akzeptablen Lsg. entspricht
                 plaene_ueber_neu.append(plaene_pal_ueber[p])
+            else:
+                break # möglich, da vorher entsprechend sortiert wurde
 
         plaene_pal_ueber = plaene_ueber_neu.copy()
 
