@@ -86,8 +86,8 @@ pss_pfad = '.../Testdaten November 2022/Daten vor Stauraumplanung/pss.asc'
 
 # zu Auswertungszwecken: Inputdateien nicht überschreiben, sondern Änderungen in einem anderen Ordner speichern
 # später für die finale Version am Standort ändern
-tar_pfad_unsere_lsg='.../Testdaten November 2022/Daten nach_eigene Lösung/tar.asc'
-pss_pfad_unsere_lsg='.../Testdaten November 2022/Daten nach_eigene Lösung/pss.asc'
+tar_pfad_unsere_lsg='.../Testdaten November 2022/Daten nach_eigene Loesung/tar.asc'
+pss_pfad_unsere_lsg='.../Testdaten November 2022/Daten nach_eigene Loesung/pss.asc'
 
 
 """

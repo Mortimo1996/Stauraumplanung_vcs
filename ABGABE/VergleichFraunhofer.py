@@ -18,7 +18,7 @@ pfad_laendervorgaben='.../Laendervorgaben.csv'
 tar_pfad = '.../Testdaten November 2022/Daten vor Stauraumplanung/tar.asc'
 blk_pfad = '.../Testdaten November 2022/Daten vor Stauraumplanung/blk.asc'
 pss_pf_nach_F = '.../Testdaten November 2022/Daten nach Stauraumplanung/pss.asc'
-pss_pf_nach_wir = '.../Testdaten November 2022/Daten nach_eigene Lösung/pss.asc'
+pss_pf_nach_wir = '.../Testdaten November 2022/Daten nach_eigene Loesung/pss.asc'
 
 
 """
